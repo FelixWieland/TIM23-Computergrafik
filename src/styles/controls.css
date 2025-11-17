@@ -1,0 +1,225 @@
+
+.controls {
+    position: fixed;
+    bottom: 20px;
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    z-index: 1000;
+}
+
+.controls-left {
+    left: 20px;
+}
+
+.controls-right {
+    right: 20px;
+}
+
+.control-btn {
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.1);
+    color: #1d1d1f;
+}
+
+.control-btn:hover {
+    background: rgba(255, 255, 255, 1);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15), 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.control-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.control-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.control-btn:disabled:hover {
+    transform: none;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Time Picker Slider Styles */
+.time-slider-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 300px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    display: none;
+}
+
+@keyframes slideInFromRight {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.time-slider-container.show {
+    display: block;
+}
+
+.time-slider-track {
+    position: relative;
+    height: 8px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    cursor: pointer;
+    margin-bottom: 12px;
+}
+
+.time-slider-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: linear-gradient(90deg, #1a1a1a 0%, #ff6b35 50%, #ffd700 100%);
+    border-radius: 4px;
+    transition: width 0.1s ease;
+}
+
+.time-slider-handle {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 50%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2), 0 2px 4px rgba(0, 0, 0, 0.1);
+    cursor: grab;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    z-index: 10;
+}
+
+.time-slider-handle:hover {
+    transform: translate(-50%, -50%) scale(1.1);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25), 0 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+.time-slider-handle:active {
+    cursor: grabbing;
+    transform: translate(-50%, -50%) scale(1.05);
+}
+
+.time-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.time-icon svg {
+    transition: all 0.3s ease;
+}
+
+.time-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #666;
+    margin-top: 8px;
+}
+
+.time-label {
+    font-weight: 500;
+}
+
+.time-display {
+    text-align: center;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1d1d1f;
+    padding: 8px 0;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+}
+
+/* Sun/Moon icon transitions */
+.time-icon.sun {
+    color: #ffd700;
+}
+
+.time-icon.moon {
+    color: #4a5568;
+}
+
+.time-icon.sun svg {
+    filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.5));
+}
+
+.time-icon.moon svg {
+    filter: drop-shadow(0 0 4px rgba(74, 85, 104, 0.5));
+}
+
+
+#fog-slider .time-slider-fill {
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 0%, rgba(200, 200, 200, 0.5) 50%, rgba(150, 150, 150, 0.8) 100%);
+}
+
+#fog-icon {
+    color: #9ca3af;
+}
+
+#fog-icon svg {
+    filter: drop-shadow(0 0 4px rgba(156, 163, 175, 0.5));
+}
+
+
+/* Slider posititioning */
+#fog-slider, #time-picker-slider, #cloud-control-slider {
+    bottom: 80px !important;
+}
+
+#cloud-control-slider {
+    width: 320px !important;
+}
+
+.slider-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1d1d1f;
+    margin-bottom: 8px;
+}
+
+#cloud-control-slider .time-slider-fill {
+    background: linear-gradient(90deg, rgba(121, 138, 160, 0.3) 0%, rgba(121, 138, 160, 0.6) 50%, rgba(121, 138, 160, 0.9) 100%);
+}
+
+#cloud-icon, #cloud-icon-amount {
+    color: #798aa0;
+}
+
+#cloud-icon svg, #cloud-icon-amount svg {
+    filter: drop-shadow(0 0 4px rgba(121, 138, 160, 0.5));
+}

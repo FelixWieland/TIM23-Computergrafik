@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tim23-computergrafik</title>
+  <link rel="stylesheet" href="/src/styles/main.css">
+  <link rel="stylesheet" href="/src/styles/loading.css">
+  <link rel="stylesheet" href="/src/styles/slide.css">
+  <link rel="stylesheet" href="/src/styles/controls.css">
+  <link rel="stylesheet" href="/src/styles/scene.css">
+</head>
+
+<body>
+  <div class="slideshow" data-slide="0">
+    <div class="slide">
+      <h1>Slide 1</h1>
+    </div>
+    <div class="slide">
+      <h1>Slide 2</h1>
+    </div>
+    <div class="slide">
+      <h1>Slide 3</h1>
+    </div>
+    <div class="slide">
+      <h1>Slide 4</h1>
+    </div>
+    <div class="slide">
+      <div id="blocker">
+      </div>
+      <div id="app"></div>
+    </div>
+  </div>
+
+  <div class="controls controls-left">
+    <button id="previous" class="control-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15,18 9,12 15,6"></polyline>
+      </svg>
+    </button>
+    <button id="next" class="control-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9,18 15,12 9,6"></polyline>
+      </svg>
+    </button>
+  </div>
+
+  <div class="controls controls-right">
+    <button id="cloud-control" class="control-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
+      </svg>
+    </button>
+    <button id="fog-control" class="control-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+        <circle cx="12" cy="12" r="4"></circle>
+      </svg>
+    </button>
+    <button id="time-picker" class="control-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <polyline points="12,6 12,12 16,14"></polyline>
+      </svg>
+    </button>
+  </div>
+
+  <div id="loading-screen">
+    <span class="loader"></span>
+  </div>
+
+  <!-- Simple Time Picker Slider -->
+  <div id="time-picker-slider" class="time-slider-container">
+    <div class="time-slider">
+      <div class="time-slider-track">
+        <div class="time-slider-fill"></div>
+        <div class="time-slider-handle" id="time-slider-handle">
+          <div class="time-icon" id="time-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="5"></circle>
+              <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div class="time-labels">
+        <span class="time-label">00:00</span>
+        <span class="time-label">12:00</span>
+        <span class="time-label">23:59</span>
+      </div>
+    </div>
+    <div class="time-display">
+      <span id="current-time-display">12:00</span>
+    </div>
+  </div>
+
+  <!-- Cloud Control Slider -->
+  <div id="cloud-control-slider" class="time-slider-container">
+    <div class="time-slider">
+      <div class="slider-label">Movement Speed</div>
+      <div class="time-slider-track" id="cloud-speed-track">
+        <div class="time-slider-fill" id="cloud-speed-fill"></div>
+        <div class="time-slider-handle" id="cloud-speed-handle">
+          <div class="time-icon" id="cloud-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div class="time-labels">
+        <span class="time-label">Slow</span>
+        <span class="time-label">Medium</span>
+        <span class="time-label">Fast</span>
+      </div>
+      <div class="time-display">
+        <span id="cloud-speed-display">0.20</span>
+      </div>
+    </div>
+    <div class="time-slider" style="margin-top: 24px;">
+      <div class="slider-label">Cloud Amount</div>
+      <div class="time-slider-track" id="cloud-amount-track">
+        <div class="time-slider-fill" id="cloud-amount-fill"></div>
+        <div class="time-slider-handle" id="cloud-amount-handle">
+          <div class="time-icon" id="cloud-icon-amount">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div class="time-labels">
+        <span class="time-label">None</span>
+        <span class="time-label">Medium</span>
+        <span class="time-label">Full</span>
+      </div>
+      <div class="time-display">
+        <span id="cloud-amount-display">70%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fog Density Slider -->
+  <div id="fog-slider" class="time-slider-container">
+    <div class="time-slider">
+      <div class="time-slider-track">
+        <div class="time-slider-fill"></div>
+        <div class="time-slider-handle" id="fog-slider-handle">
+          <div class="time-icon" id="fog-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+              <circle cx="12" cy="12" r="4"></circle>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div class="time-labels">
+        <span class="time-label">None</span>
+        <span class="time-label">Medium</span>
+        <span class="time-label">Dense</span>
+      </div>
+    </div>
+    <div class="time-display">
+      <span id="fog-density-display">0.00</span>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+
+</html>
