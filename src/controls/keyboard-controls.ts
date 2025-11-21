@@ -55,6 +55,12 @@ export class KeyboardControls {
             case 'ShiftRight':
                 this.moveDown = true;
                 break;
+            case 'Enter':
+                // Exit pointer lock when Enter is pressed
+                if (this.controls.isLocked) {
+                    this.controls.unlock();
+                }
+                break;
         }
     }
 

@@ -7,6 +7,7 @@ import { TimePicker } from './controls/time-picker.ts';
 import { FogSlider } from './controls/fog-slider.ts';
 import { CloudControl } from './controls/cloud-control.ts';
 import { LanternControl } from './controls/lantern-control.ts';
+import { FullscreenControl } from './controls/fullscreen-control.ts';
 
 import { getReferenceDistance } from './util';
 import Stats from 'three/examples/jsm/libs/stats.module.js';
@@ -31,6 +32,9 @@ function main() {
 
     // Lantern Control
     const lanternControl = new LanternControl();
+
+    // Fullscreen Control
+    const fullscreenControl = new FullscreenControl();
 
     // Stats
     const stats = new Stats();
@@ -139,6 +143,7 @@ function main() {
     (window as any).scene = customScene;
     (window as any).sun = customScene.getSun();
     (window as any).timePicker = timePicker;
+    (window as any).fullscreenControl = fullscreenControl;
     
     // Test: Force sun to noon position for better lighting
     setTimeout(() => {

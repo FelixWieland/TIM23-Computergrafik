@@ -8,6 +8,7 @@ export class Controls {
     private fogControlButton: HTMLButtonElement;
     private cloudControlButton: HTMLButtonElement;
     private lanternControlButton: HTMLButtonElement;
+    private fullscreenButton: HTMLButtonElement;
 
     constructor() {
         this.previousButton = document.getElementById('previous') as HTMLButtonElement;
@@ -16,6 +17,7 @@ export class Controls {
         this.fogControlButton = document.getElementById('fog-control') as HTMLButtonElement;
         this.cloudControlButton = document.getElementById('cloud-control') as HTMLButtonElement;
         this.lanternControlButton = document.getElementById('lantern-control') as HTMLButtonElement;
+        this.fullscreenButton = document.getElementById('fullscreen') as HTMLButtonElement;
     }
 
     registerPreviousButton(action: () => void): void {
@@ -46,5 +48,10 @@ export class Controls {
     registerLanternControlButton(action: () => void): void {
         console.log('registering lantern control button');
         this.lanternControlButton.addEventListener('click', action);
+    }
+
+    registerFullscreenButton(action: () => void): void {
+        console.log('registering fullscreen button');
+        this.fullscreenButton.addEventListener('click', action);
     }
 }
