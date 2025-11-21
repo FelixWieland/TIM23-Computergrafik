@@ -3,7 +3,7 @@ export class FogSlider {
     private sliderTrack: HTMLElement;
     private sliderHandle: HTMLElement;
     private sliderFill: HTMLElement;
-    private fogIcon: HTMLElement;
+    // private fogIcon: HTMLElement;
     private densityDisplay: HTMLElement;
     private onDensityChangeCallback?: (density: number) => void;
     private isDragging: boolean = false;
@@ -15,7 +15,7 @@ export class FogSlider {
         this.sliderTrack = this.sliderContainer.querySelector('.time-slider-track') as HTMLElement;
         this.sliderHandle = document.getElementById('fog-slider-handle') as HTMLElement;
         this.sliderFill = this.sliderContainer.querySelector('.time-slider-fill') as HTMLElement;
-        this.fogIcon = document.getElementById('fog-icon') as HTMLElement;
+        // this.fogIcon = document.getElementById('fog-icon') as HTMLElement;
         this.densityDisplay = document.getElementById('fog-density-display') as HTMLElement;
 
         this.setupEventListeners();

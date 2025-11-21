@@ -63,38 +63,6 @@ export function coordsToPixel(lat: number, long: number): { x: number; y: number
 }
 
 /**
- * Convert 3D world coordinates back to latitude and longitude
- * @param x X coordinate in 3D space
- * @param y Y coordinate in 3D space (not used for lat/long calculation)
- * @param z Z coordinate in 3D space
- * @returns Object with latitude and longitude
- */
-export function pixelToCoords(x: number, y: number, z: number): { lat: number; long: number } {
-    // Calculate distance from reference point
-    const distance = Math.sqrt(x * x + z * z);
-    
-    // Calculate bearing
-    const bearing = Math.atan2(x, z);
-    
-    // Convert back to lat/long using inverse formulas
-    const lat1 = REF_LAT * Math.PI / 180;
-    const dLat = distance / EARTH_RADIUS;
-    
-    const lat2 = Math.asin(Math.sin(lat1) * Math.cos(dLat) + 
-                          Math.cos(lat1) * Math.sin(dLat) * Math.cos(bearing));
-    
-    const dLon = Math.atan2(Math.sin(bearing) * Math.sin(dLat) * Math.cos(lat1),
-                           Math.cos(dLat) - Math.sin(lat1) * Math.sin(lat2));
-    
-    const long2 = REF_LONG * Math.PI / 180 + dLon;
-    
-    return {
-        lat: lat2 * 180 / Math.PI,
-        long: long2 * 180 / Math.PI
-    };
-}
-
-/**
  * Calculate the distance between the two reference points for scaling
  */
 export function getReferenceDistance(): number {

@@ -48,6 +48,14 @@
   </div>
 
   <div class="controls controls-right">
+    <button id="lantern-control" class="control-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="9" y1="18" x2="15" y2="18"></line>
+        <line x1="10" y1="22" x2="14" y2="22"></line>
+        <line x1="15" y1="21" x2="15" y2="20"></line>
+        <path d="M12 2a7 7 0 0 0-7 7c0 2.5 1.5 4.5 3.5 5.5L9 18h6l.5-3.5c2-1 3.5-3 3.5-5.5a7 7 0 0 0-7-7z"></path>
+      </svg>
+    </button>
     <button id="cloud-control" class="control-btn">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
@@ -70,6 +78,8 @@
   <div id="loading-screen">
     <span class="loader"></span>
   </div>
+
+  <div id="stats-panel"></div>
 
   <!-- Simple Time Picker Slider -->
   <div id="time-picker-slider" class="time-slider-container">
@@ -164,6 +174,58 @@
     </div>
     <div class="time-display">
       <span id="fog-density-display">0.00</span>
+    </div>
+  </div>
+
+  <!-- Lantern Control Slider -->
+  <div id="lantern-control-slider" class="time-slider-container">
+    <div class="time-slider">
+      <div class="slider-label">Color Warmth</div>
+      <div class="time-slider-track" id="lantern-warmth-track">
+        <div class="time-slider-fill" id="lantern-warmth-fill"></div>
+        <div class="time-slider-handle" id="lantern-warmth-handle">
+          <div class="time-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 21h6M12 3v18M9 6l3-3 3 3M9 18l3 3 3-3"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div class="time-labels">
+        <span class="time-label">Cool</span>
+        <span class="time-label">Medium</span>
+        <span class="time-label">Warm</span>
+      </div>
+      <div class="time-display">
+        <span id="lantern-warmth-display">50%</span>
+      </div>
+    </div>
+    <div class="time-slider" style="margin-top: 24px;">
+      <div class="slider-label">Intensity</div>
+      <div class="time-slider-track" id="lantern-intensity-track">
+        <div class="time-slider-fill" id="lantern-intensity-fill"></div>
+        <div class="time-slider-handle" id="lantern-intensity-handle">
+          <div class="time-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 21h6M12 3v18M9 6l3-3 3 3M9 18l3 3 3-3"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div class="time-labels">
+        <span class="time-label">Low</span>
+        <span class="time-label">Medium</span>
+        <span class="time-label">High</span>
+      </div>
+      <div class="time-display">
+        <span id="lantern-intensity-display">10.0</span>
+      </div>
+    </div>
+    <div style="margin-top: 24px; display: flex; align-items: center; gap: 12px;">
+      <label for="lantern-enable-checkbox" style="font-size: 14px; cursor: pointer;">Enable Lighting</label>
+      <input type="checkbox" id="lantern-enable-checkbox" checked style="width: 20px; height: 20px; cursor: pointer;">
     </div>
   </div>
 

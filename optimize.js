@@ -1,30 +1,38 @@
 import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
-import { readdir, unlink } from 'fs/promises';
+import { readdir, unlink, mkdir } from 'fs/promises';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const exportedDir = join(__dirname, 'blender', 'exported');
+const outputDir = join(__dirname, 'public', 'models');
 
 // Function to optimize a single file
 async function optimizeFile(filename) {
   const inputPath = join(exportedDir, `${filename}.glb`);
-  const optimPath = join(exportedDir, `${filename}.optim.glb`);
+  const optimPath = join(outputDir, `${filename}.optim.glb`);
 
   console.log(`\n[${filename}] Starting optimization...`);
   console.log(`[${filename}] Input: ${inputPath}`);
   console.log(`[${filename}] Output: ${optimPath}`);
 
   try {
-    // Step 1: Deduplicate
-    console.log(`[${filename}] Running dedup...`);
-    execSync(`gltf-transform dedup "${inputPath}" "${optimPath}"`, {
+    // Step 1: Resize textures (reduce resolution to max 128x128)
+    console.log(`[${filename}] Resizing textures to max 128x128...`);
+    execSync(`gltf-transform resize "${inputPath}" "${optimPath}" --width 128 --height 128`, {
       stdio: 'inherit',
       cwd: __dirname
     });
 
-    // Step 2: Instance
+    // Step 2: Deduplicate
+    console.log(`[${filename}] Running dedup...`);
+    execSync(`gltf-transform dedup "${optimPath}" "${optimPath}"`, {
+      stdio: 'inherit',
+      cwd: __dirname
+    });
+
+    // Step 3: Instance
     console.log(`[${filename}] Running instance...`);
     execSync(`gltf-transform instance "${optimPath}" "${optimPath}"`, {
       stdio: 'inherit',
@@ -48,17 +56,26 @@ if (!filename) {
   console.log('='.repeat(50));
   
   try {
-    // Step 1: Delete all .optim.glb files
+    // Step 0: Ensure output directory exists
+    await mkdir(outputDir, { recursive: true });
+
+    // Step 1: Delete all .optim.glb files from output directory
     console.log('\nStep 1: Cleaning up existing optimized files...');
-    const files = await readdir(exportedDir);
-    const optimFiles = files.filter(f => f.endsWith('.optim.glb'));
+    let optimFiles = [];
+    try {
+      const outputFiles = await readdir(outputDir);
+      optimFiles = outputFiles.filter(f => f.endsWith('.optim.glb'));
+    } catch (error) {
+      // Output directory might not exist yet, that's okay
+      console.log('  Output directory does not exist yet, will be created.');
+    }
     
     if (optimFiles.length === 0) {
       console.log('  No existing optimized files to clean up.');
     } else {
       console.log(`  Found ${optimFiles.length} optimized file(s) to delete:`);
       for (const file of optimFiles) {
-        const filePath = join(exportedDir, file);
+        const filePath = join(outputDir, file);
         await unlink(filePath);
         console.log(`  ✓ Deleted: ${file}`);
       }
@@ -66,6 +83,7 @@ if (!filename) {
 
     // Step 2: Find all .glb files (excluding .optim.glb)
     console.log('\nStep 2: Finding .glb files to optimize...');
+    const files = await readdir(exportedDir);
     const glbFiles = files.filter(f => f.endsWith('.glb') && !f.endsWith('.optim.glb'));
     
     if (glbFiles.length === 0) {

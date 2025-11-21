@@ -6,7 +6,7 @@ export class CloudControl {
     private amountSliderTrack: HTMLElement;
     private amountSliderHandle: HTMLElement;
     private amountSliderFill: HTMLElement;
-    private cloudIcon: HTMLElement;
+    // private cloudIcon: HTMLElement;
     private speedDisplay: HTMLElement;
     private amountDisplay: HTMLElement;
     private onSpeedChangeCallback?: (speed: number) => void;
@@ -26,7 +26,7 @@ export class CloudControl {
         this.amountSliderTrack = document.getElementById('cloud-amount-track') as HTMLElement;
         this.amountSliderHandle = document.getElementById('cloud-amount-handle') as HTMLElement;
         this.amountSliderFill = document.getElementById('cloud-amount-fill') as HTMLElement;
-        this.cloudIcon = document.getElementById('cloud-icon') as HTMLElement;
+        // this.cloudIcon = document.getElementById('cloud-icon') as HTMLElement;
         this.speedDisplay = document.getElementById('cloud-speed-display') as HTMLElement;
         this.amountDisplay = document.getElementById('cloud-amount-display') as HTMLElement;
 

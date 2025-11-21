@@ -6,6 +6,7 @@ import { Controls } from './controls.ts';
 import { TimePicker } from './controls/time-picker.ts';
 import { FogSlider } from './controls/fog-slider.ts';
 import { CloudControl } from './controls/cloud-control.ts';
+import { LanternControl } from './controls/lantern-control.ts';
 
 import { getReferenceDistance } from './util';
 import Stats from 'three/examples/jsm/libs/stats.module.js';
@@ -28,10 +29,13 @@ function main() {
     // Cloud Control
     const cloudControl = new CloudControl();
 
+    // Lantern Control
+    const lanternControl = new LanternControl();
+
     // Stats
     const stats = new Stats();
-	stats.showPanel( 1 );
-	document.body.appendChild( stats.dom );
+	stats.showPanel(0);
+    document.getElementById("stats-panel")?.appendChild(stats.dom)
 
     // Scene
     // Create the Three.js scene, camera, and renderer
@@ -52,7 +56,6 @@ function main() {
 
     // Create our custom scene class
     const customScene = new Scene(scene, camera, renderer);
-    customScene.setup();
 
     // Connect time picker to controls and sun
     controls.registerTimePickerButton(() => {
@@ -67,6 +70,11 @@ function main() {
     // Connect cloud control to controls
     controls.registerCloudControlButton(() => {
         cloudControl.show();
+    });
+
+    // Connect lantern control to controls
+    controls.registerLanternControlButton(() => {
+        lanternControl.show();
     });
 
     // Handle time picker changes
@@ -103,6 +111,25 @@ function main() {
         const clouds = customScene.getClouds();
         clouds.setCloudAmount(amount);
         console.log(`Cloud amount set to: ${(amount * 100).toFixed(0)}%`);
+    });
+
+    // Handle lantern control changes
+    lanternControl.onWarmthChange((warmth: number) => {
+        const lanterns = customScene.getLanterns();
+        lanterns.setWarmth(warmth);
+        console.log(`Lantern warmth set to: ${(warmth * 100).toFixed(0)}%`);
+    });
+
+    lanternControl.onIntensityChange((intensity: number) => {
+        const lanterns = customScene.getLanterns();
+        lanterns.setIntensity(intensity);
+        console.log(`Lantern intensity set to: ${intensity.toFixed(1)}`);
+    });
+
+    lanternControl.onEnableChange((enabled: boolean) => {
+        const lanterns = customScene.getLanterns();
+        lanterns.setEnabled(enabled);
+        console.log(`Lantern lighting ${enabled ? 'enabled' : 'disabled'}`);
     });
 
     // Expose scene globally for testing

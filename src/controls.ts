@@ -7,6 +7,7 @@ export class Controls {
     private timePickerButton: HTMLButtonElement;
     private fogControlButton: HTMLButtonElement;
     private cloudControlButton: HTMLButtonElement;
+    private lanternControlButton: HTMLButtonElement;
 
     constructor() {
         this.previousButton = document.getElementById('previous') as HTMLButtonElement;
@@ -14,6 +15,7 @@ export class Controls {
         this.timePickerButton = document.getElementById('time-picker') as HTMLButtonElement;
         this.fogControlButton = document.getElementById('fog-control') as HTMLButtonElement;
         this.cloudControlButton = document.getElementById('cloud-control') as HTMLButtonElement;
+        this.lanternControlButton = document.getElementById('lantern-control') as HTMLButtonElement;
     }
 
     registerPreviousButton(action: () => void): void {
@@ -39,5 +41,10 @@ export class Controls {
     registerCloudControlButton(action: () => void): void {
         console.log('registering cloud control button');
         this.cloudControlButton.addEventListener('click', action);
+    }
+
+    registerLanternControlButton(action: () => void): void {
+        console.log('registering lantern control button');
+        this.lanternControlButton.addEventListener('click', action);
     }
 }
