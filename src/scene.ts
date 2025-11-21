@@ -11,14 +11,16 @@ import { Gardens } from './nodes/gardens';
 import { Houses } from './nodes/houses';
 import { Terrain } from './nodes/terrain';
 import { Trees } from './nodes/trees';
-import { Water } from './ambient/water';
 import { Lanterns } from './nodes/lanterns';
+import { Water } from './ambient/water';
+import { KeyboardControls } from './controls/keyboard-controls';
 
 export class Scene {
     private scene: THREE.Scene;
     private camera: THREE.PerspectiveCamera;
     private renderer: THREE.WebGLRenderer;
     private controls!: PointerLockControls;
+    private keyboardControls!: KeyboardControls;
 
     // Ambient
     private sun!: Sun;
@@ -28,28 +30,19 @@ export class Scene {
     private water!: Water;
 
     // Nodes
+    // @ts-ignore
     private churches!: Churches
+    // @ts-ignore
     private terrain!: Terrain
+    // @ts-ignore
     private gardens!: Gardens
+    // @ts-ignore
     private houses!: Houses
+    // @ts-ignore
     private trees!: Trees
+    // @ts-ignore
     private cityWall!: CityWall
     private lanterns!: Lanterns
-
-    // Physics and movement properties
-    private velocity = new THREE.Vector3();
-    private direction = new THREE.Vector3();
-    
-    // Movement flags
-    private moveForward = false;
-    private moveBackward = false;
-    private moveLeft = false;
-    private moveRight = false;
-    private moveUp = false;
-    private moveDown = false;
-    
-    // Time tracking
-    private prevTime = performance.now();
 
     constructor(scene: THREE.Scene, camera: THREE.PerspectiveCamera, renderer: THREE.WebGLRenderer) {
         this.scene = scene;
@@ -63,7 +56,6 @@ export class Scene {
         this.setupDebugLighting()
         this.setupCamera();
         this.setupPointerLockControls();
-        this.setupKeyboardControls();
 
         // Create ambient
         this.sun = new Sun(this.scene)
@@ -126,101 +118,9 @@ export class Scene {
         this.controls.addEventListener('unlock', () => {
             if (blocker) blocker.style.display = 'block';
         });
+        
+        this.keyboardControls = new KeyboardControls(this.controls);
     }
-
-    private setupKeyboardControls() {
-        const onKeyDown = (event: KeyboardEvent) => {
-            switch (event.code) {
-                case 'ArrowUp':
-                case 'KeyW':
-                    this.moveForward = true;
-                    break;
-                case 'ArrowLeft':
-                case 'KeyA':
-                    this.moveLeft = true;
-                    break;
-                case 'ArrowDown':
-                case 'KeyS':
-                    this.moveBackward = true;
-                    break;
-                case 'ArrowRight':
-                case 'KeyD':
-                    this.moveRight = true;
-                    break;
-                case 'Space':
-                    this.moveUp = true;
-                    break;
-                case 'ShiftLeft':
-                case 'ShiftRight':
-                    this.moveDown = true;
-                    break;
-            }
-        };
-
-        const onKeyUp = (event: KeyboardEvent) => {
-            switch (event.code) {
-                case 'ArrowUp':
-                case 'KeyW':
-                    this.moveForward = false;
-                    break;
-                case 'ArrowLeft':
-                case 'KeyA':
-                    this.moveLeft = false;
-                    break;
-                case 'ArrowDown':
-                case 'KeyS':
-                    this.moveBackward = false;
-                    break;
-                case 'ArrowRight':
-                case 'KeyD':
-                    this.moveRight = false;
-                    break;
-                case 'Space':
-                    this.moveUp = false;
-                    break;
-                case 'ShiftLeft':
-                case 'ShiftRight':
-                    this.moveDown = false;
-                    break;
-                case 'KeyT':
-                    break;
-            }
-        };
-
-        document.addEventListener('keydown', onKeyDown);
-        document.addEventListener('keyup', onKeyUp);
-    }
-
-   
-
-    private updatePhysics() {
-        const time = performance.now();
-
-        if (this.controls.isLocked === true) {
-            const delta = (time - this.prevTime) / 1000;
-
-            this.velocity.x -= this.velocity.x * 10.0 * delta;
-            this.velocity.z -= this.velocity.z * 10.0 * delta;
-            this.velocity.y -= this.velocity.y * 10.0 * delta; 
-
-            this.direction.z = Number(this.moveForward) - Number(this.moveBackward);
-            this.direction.x = Number(this.moveRight) - Number(this.moveLeft);
-            this.direction.normalize();
-
-            if (this.moveForward || this.moveBackward) this.velocity.z -= this.direction.z * 400.0 * 4 * delta;
-            if (this.moveLeft || this.moveRight) this.velocity.x -= this.direction.x * 400.0 * 4 * delta;
-
-            if (this.moveUp) this.velocity.y += 400.0 * 4 * delta; // Fly up
-            if (this.moveDown) this.velocity.y -= 400.0 * 4 * delta; // Fly down
-
-            this.controls.moveRight(-this.velocity.x * delta);
-            this.controls.moveForward(-this.velocity.z * delta);
-            this.controls.object.position.y += (this.velocity.y * delta);
-        }
-
-        this.prevTime = time;
-    }
-
 
     public getSun(): Sun {
         return this.sun;
@@ -239,7 +139,7 @@ export class Scene {
     }
 
     public animate() {
-        this.updatePhysics();
+        this.keyboardControls.update();
         
         let solarInfo: { azimuth: number, elevation: number, isDay: boolean } | null = null;
         if (this.sun) {

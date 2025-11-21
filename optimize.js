@@ -18,23 +18,58 @@ async function optimizeFile(filename) {
   console.log(`[${filename}] Output: ${optimPath}`);
 
   try {
-    // Step 1: Resize textures (reduce resolution to max 128x128)
-    console.log(`[${filename}] Resizing textures to max 128x128...`);
-    execSync(`gltf-transform resize "${inputPath}" "${optimPath}" --width 128 --height 128`, {
+    // Step 1: Prune unused data first (removes unnecessary data early)
+    console.log(`[${filename}] Pruning unused data...`);
+    execSync(`gltf-transform prune "${inputPath}" "${optimPath}"`, {
       stdio: 'inherit',
       cwd: __dirname
     });
 
-    // Step 2: Deduplicate
+    // Step 2: Resize textures (reduce resolution to max 128x128)
+    console.log(`[${filename}] Resizing textures to max 128x128...`);
+    execSync(`gltf-transform resize "${optimPath}" "${optimPath}" --width 128 --height 128`, {
+      stdio: 'inherit',
+      cwd: __dirname
+    });
+
+    // Step 3: Compress textures to WebP
+    console.log(`[${filename}] Compressing textures to WebP...`);
+    execSync(`gltf-transform webp "${optimPath}" "${optimPath}" --quality 80`, {
+      stdio: 'inherit',
+      cwd: __dirname
+    });
+
+    // Step 4: Quantize attributes (reduce precision)
+    console.log(`[${filename}] Quantizing attributes...`);
+    execSync(`gltf-transform quantize "${optimPath}" "${optimPath}"`, {
+      stdio: 'inherit',
+      cwd: __dirname
+    });
+
+    // Step 5: Simplify meshes (adjust ratio based on your needs)
+    console.log(`[${filename}] Simplifying meshes...`);
+    execSync(`gltf-transform simplify "${optimPath}" "${optimPath}" --ratio 0.7`, {
+      stdio: 'inherit',
+      cwd: __dirname
+    });
+
+    // Step 6: Deduplicate
     console.log(`[${filename}] Running dedup...`);
     execSync(`gltf-transform dedup "${optimPath}" "${optimPath}"`, {
       stdio: 'inherit',
       cwd: __dirname
     });
 
-    // Step 3: Instance
+    // Step 7: Instance
     console.log(`[${filename}] Running instance...`);
     execSync(`gltf-transform instance "${optimPath}" "${optimPath}"`, {
+      stdio: 'inherit',
+      cwd: __dirname
+    });
+
+    // Step 8: Apply Meshopt compression (final step)
+    console.log(`[${filename}] Applying Meshopt compression...`);
+    execSync(`gltf-transform meshopt "${optimPath}" "${optimPath}"`, {
       stdio: 'inherit',
       cwd: __dirname
     });

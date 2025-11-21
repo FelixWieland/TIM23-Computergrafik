@@ -43,7 +43,10 @@ function main() {
     // Set far plane to accommodate the large skybox (3x table size + buffer)
     const distance = getReferenceDistance();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, distance * 5);
-    const renderer = new THREE.WebGLRenderer();
+    const renderer = new THREE.WebGLRenderer({
+        antialias: false,
+        powerPreference: "high-performance",
+    });
 
     // Set up the renderer
     renderer.setSize(window.innerWidth, window.innerHeight);
