@@ -195,6 +195,7 @@ export class KeyboardControls {
     }
 
     private saveCameraState(): void {
+        return;
         const camera = this.controls.object;
         const position = camera.position;
         const rotation = camera.rotation;

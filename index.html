@@ -45,6 +45,12 @@
         <polyline points="9,18 15,12 9,6"></polyline>
       </svg>
     </button>
+    <button id="tours-control" class="control-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+        <circle cx="12" cy="10" r="3"></circle>
+      </svg>
+    </button>
   </div>
 
   <div class="controls controls-right">
@@ -72,6 +78,12 @@
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="10"></circle>
         <polyline points="12,6 12,12 16,14"></polyline>
+      </svg>
+    </button>
+    <button id="copy-settings" class="control-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
       </svg>
     </button>
     <button id="fullscreen" class="control-btn">
@@ -235,6 +247,14 @@
     <div style="margin-top: 24px; display: flex; align-items: center; gap: 12px;">
       <label for="lantern-enable-checkbox" style="font-size: 14px; cursor: pointer;">Enable Lighting</label>
       <input type="checkbox" id="lantern-enable-checkbox" checked style="width: 20px; height: 20px; cursor: pointer;">
+    </div>
+  </div>
+
+  <!-- Tours Popup -->
+  <div id="tours-popup" class="time-slider-container">
+    <div class="tours-popup-content">
+      <div class="slider-label" style="margin-bottom: 16px;">Select a Tour</div>
+      <div id="tours-list" class="tours-list"></div>
     </div>
   </div>
 

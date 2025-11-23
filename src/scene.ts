@@ -102,6 +102,8 @@ export class Scene {
         const distance = getReferenceDistance();
         this.camera.position.set(0, distance * 0.1, distance * 0.2);
         this.camera.lookAt(0, 1, 0);
+        // Set rotation order to YXZ for first-person camera to avoid gimbal lock
+        this.camera.rotation.order = 'YXZ';
     }
 
     private setupPointerLockControls() {
@@ -144,9 +146,13 @@ export class Scene {
         return this.clocks;
     }
 
-    // public getCollisionDetector(): CollisionDetector {
-    //     return this.collisionDetector;
-    // }
+    public getCamera(): THREE.PerspectiveCamera {
+        return this.camera;
+    }
+
+    public getControls(): PointerLockControls {
+        return this.controls;
+    }
 
     public animate() {
         this.keyboardControls.update();

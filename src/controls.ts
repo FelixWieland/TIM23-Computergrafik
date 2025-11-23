@@ -4,6 +4,7 @@ export class Controls {
 
     private previousButton: HTMLButtonElement;
     private nextButton: HTMLButtonElement;
+    private tourControlButton: HTMLButtonElement;
     private timePickerButton: HTMLButtonElement;
     private fogControlButton: HTMLButtonElement;
     private cloudControlButton: HTMLButtonElement;
@@ -13,6 +14,7 @@ export class Controls {
     constructor() {
         this.previousButton = document.getElementById('previous') as HTMLButtonElement;
         this.nextButton = document.getElementById('next') as HTMLButtonElement;
+        this.tourControlButton = document.getElementById('tours-control') as HTMLButtonElement;
         this.timePickerButton = document.getElementById('time-picker') as HTMLButtonElement;
         this.fogControlButton = document.getElementById('fog-control') as HTMLButtonElement;
         this.cloudControlButton = document.getElementById('cloud-control') as HTMLButtonElement;
@@ -28,6 +30,11 @@ export class Controls {
     registerNextButton(action: () => void): void {
         console.log('registering next button');
         this.nextButton.addEventListener('click', action);
+    }
+
+    registerTourControlButton(action: () => void): void {
+        console.log('registering tour control button');
+        this.tourControlButton.addEventListener('click', action);
     }
 
     registerTimePickerButton(action: () => void): void {

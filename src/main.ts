@@ -9,6 +9,11 @@ import { CloudControl } from './controls/cloud-control.ts';
 import { LanternControl } from './controls/lantern-control.ts';
 import { FullscreenControl } from './controls/fullscreen-control.ts';
 import { CoordinatesDisplay } from './controls/coordinates-display.ts';
+import { TourControl } from './controls/tour-control.ts';
+import { Tour } from './tours/tour';
+import { tours } from './tours/tours';
+import { TourAnimator } from './tours/tour-animator';
+import { CopySettingsControl } from './controls/copy-settings-control';
 
 import { getReferenceDistance } from './util';
 import Stats from 'three/examples/jsm/libs/stats.module.js';
@@ -33,6 +38,16 @@ function main() {
 
     // Lantern Control
     const lanternControl = new LanternControl();
+
+    // Tour Control
+    const tourControl = new TourControl();
+    tourControl.setTours(tours);
+
+    // Tour Animator
+    const tourAnimator = new TourAnimator();
+
+    // Copy Settings Control
+    const copySettingsControl = new CopySettingsControl();
 
     // Fullscreen Control
     const fullscreenControl = new FullscreenControl();
@@ -68,6 +83,16 @@ function main() {
     // Coordinates Display
     const coordinatesDisplay = new CoordinatesDisplay(camera);
 
+    // Set up copy settings control handlers
+    copySettingsControl.setHandlers(
+        camera,
+        customScene,
+        timePicker,
+        fogSlider,
+        cloudControl,
+        lanternControl
+    );
+
     // Connect time picker to controls and sun
     controls.registerTimePickerButton(() => {
         timePicker.show();
@@ -86,6 +111,11 @@ function main() {
     // Connect lantern control to controls
     controls.registerLanternControlButton(() => {
         lanternControl.show();
+    });
+
+    // Connect tour control to controls
+    controls.registerTourControlButton(() => {
+        tourControl.show();
     });
 
     // Handle time picker changes
@@ -145,6 +175,28 @@ function main() {
         const lanterns = customScene.getLanterns();
         lanterns.setEnabled(enabled);
         console.log(`Lantern lighting ${enabled ? 'enabled' : 'disabled'}`);
+    });
+
+    // Handle tour selection
+    tourControl.onTourSelect(async (tour: Tour) => {
+        console.log(`Starting tour: ${tour.name}`);
+        
+        const camera = customScene.getCamera();
+        
+        // Animate through all parameters sequentially
+        for (const parameter of tour.parameters) {
+            await tourAnimator.animateTourParameter(
+                parameter,
+                camera,
+                customScene,
+                timePicker,
+                fogSlider,
+                cloudControl,
+                lanternControl
+            );
+        }
+        
+        console.log(`Tour completed: ${tour.name}`);
     });
 
     // Expose scene globally for testing
