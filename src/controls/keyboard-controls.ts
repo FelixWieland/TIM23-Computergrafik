@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls.js';
+import { CollisionDetector } from './collision-detector';
 
 export class KeyboardControls {
     // Movement flags
@@ -10,17 +11,18 @@ export class KeyboardControls {
     private moveUp = false;
     private moveDown = false;
 
-    // Physics and movement properties
+    private playerHeight = 2.0;
+
     private velocity = new THREE.Vector3();
     private direction = new THREE.Vector3();
     
-    // Time tracking
     private prevTime = performance.now();
 
     private controls: PointerLockControls;
     private onKeyDownHandler: (event: KeyboardEvent) => void;
     private onKeyUpHandler: (event: KeyboardEvent) => void;
     private saveIntervalId: number | null = null;
+    private collisionDetector: CollisionDetector | null = null;
 
     constructor(controls: PointerLockControls) {
         this.controls = controls;
@@ -30,13 +32,10 @@ export class KeyboardControls {
         document.addEventListener('keydown', this.onKeyDownHandler);
         document.addEventListener('keyup', this.onKeyUpHandler);
         
-        // Restore camera position and rotation from session storage
         this.restoreCameraState();
         
-        // Save camera state periodically (every second)
         this.saveIntervalId = window.setInterval(() => this.saveCameraState(), 1000);
         
-        // Also save when controls are unlocked
         this.controls.addEventListener('unlock', () => this.saveCameraState());
     }
 
@@ -104,7 +103,6 @@ export class KeyboardControls {
         }
     }
 
-    // Update camera position based on keyboard input and physics
     public update(): void {
         const time = performance.now();
 
@@ -125,15 +123,77 @@ export class KeyboardControls {
             if (this.moveUp) this.velocity.y += 100.0 * 4 * delta; // Fly up
             if (this.moveDown) this.velocity.y -= 100.0 * 4 * delta; // Fly down
 
-            this.controls.moveRight(-this.velocity.x * delta);
-            this.controls.moveForward(-this.velocity.z * delta);
-            this.controls.object.position.y += (this.velocity.y * delta);
+            if (this.collisionDetector) {
+                const currentPosition = this.controls.object.position.clone();
+                
+                const cameraRelativeMovement = new THREE.Vector3(
+                    -this.velocity.x * delta,  // left/right
+                    this.velocity.y * delta,   // up/down
+                    -this.velocity.z * delta   // forward/back
+                );
+
+                const camera = this.controls.object;
+                const right = new THREE.Vector3(1, 0, 0).applyQuaternion(camera.quaternion);
+                let forward = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
+                
+                forward.y = 0;
+                forward.normalize();
+                
+                const up = new THREE.Vector3(0, 1, 0);
+
+                const worldMovement = new THREE.Vector3()
+                    .addScaledVector(right, cameraRelativeMovement.x)
+                    .addScaledVector(up, cameraRelativeMovement.y)
+                    .addScaledVector(forward, cameraRelativeMovement.z);
+
+                const xMovement = new THREE.Vector3(worldMovement.x, 0, 0);
+                const yMovement = new THREE.Vector3(0, worldMovement.y, 0);
+                const zMovement = new THREE.Vector3(0, 0, worldMovement.z);
+
+                let allowedXMovement = xMovement;
+                if (xMovement.length() > 0.001) {
+                    allowedXMovement = this.collisionDetector.getAllowedMovement(currentPosition, xMovement);
+                }
+
+                const afterXPosition = currentPosition.clone().add(allowedXMovement);
+
+                let allowedYMovement = yMovement;
+                if (yMovement.length() > 0.001) {
+                    allowedYMovement = this.collisionDetector.getAllowedMovement(afterXPosition, yMovement);
+                }
+
+                const afterYPosition = afterXPosition.clone().add(allowedYMovement);
+
+                let allowedZMovement = zMovement;
+                if (zMovement.length() > 0.001) {
+                    allowedZMovement = this.collisionDetector.getAllowedMovement(afterYPosition, zMovement);
+                }
+
+                const finalPosition = afterYPosition.clone().add(allowedZMovement);
+                this.controls.object.position.copy(finalPosition);
+
+                const groundHeight = this.collisionDetector.getGroundHeight(finalPosition);
+                if (groundHeight !== null) {
+                    const minHeight = groundHeight + this.playerHeight;
+                    if (!(this.moveUp && this.controls.object.position.y > minHeight))  {
+                        this.controls.object.position.y = minHeight;
+                    }
+                }
+
+                const actualWorldMovement = allowedXMovement.clone().add(allowedYMovement).add(allowedZMovement);
+                if (actualWorldMovement.length() < worldMovement.length() * 0.9) {
+                    this.velocity.multiplyScalar(0.5);
+                }
+            } else {
+                this.controls.moveRight(-this.velocity.x * delta);
+                this.controls.moveForward(-this.velocity.z * delta);
+                this.controls.object.position.y += (this.velocity.y * delta);
+            }
         }
 
         this.prevTime = time;
     }
 
-    // Save camera position and rotation to session storage
     private saveCameraState(): void {
         const camera = this.controls.object;
         const position = camera.position;
@@ -159,7 +219,6 @@ export class KeyboardControls {
         }
     }
 
-    // Restore camera position and rotation from session storage
     private restoreCameraState(): void {
         try {
             const savedState = sessionStorage.getItem('cameraState');
@@ -167,7 +226,6 @@ export class KeyboardControls {
                 const cameraState = JSON.parse(savedState);
                 const camera = this.controls.object;
                 
-                // Restore position
                 if (cameraState.position) {
                     camera.position.set(
                         cameraState.position.x,
@@ -176,7 +234,6 @@ export class KeyboardControls {
                     );
                 }
                 
-                // Restore rotation
                 if (cameraState.rotation) {
                     camera.rotation.set(
                         cameraState.rotation.x,
@@ -190,12 +247,14 @@ export class KeyboardControls {
         }
     }
 
-    // Cleanup method to remove event listeners
+    public setCollisionDetector(detector: CollisionDetector | null): void {
+        this.collisionDetector = detector;
+    }
+
     public dispose(): void {
         document.removeEventListener('keydown', this.onKeyDownHandler);
         document.removeEventListener('keyup', this.onKeyUpHandler);
         
-        // Clear the save interval
         if (this.saveIntervalId !== null) {
             clearInterval(this.saveIntervalId);
             this.saveIntervalId = null;

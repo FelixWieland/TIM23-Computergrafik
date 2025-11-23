@@ -15,6 +15,7 @@ import { Lanterns } from './nodes/lanterns';
 import { Water } from './ambient/water';
 import { KeyboardControls } from './controls/keyboard-controls';
 import { Clocks } from './nodes/clocks';
+import { CollisionDetector } from './controls/collision-detector';
 
 export class Scene {
     private scene: THREE.Scene;
@@ -22,6 +23,7 @@ export class Scene {
     private renderer: THREE.WebGLRenderer;
     private controls!: PointerLockControls;
     private keyboardControls!: KeyboardControls;
+    private collisionDetector!: CollisionDetector;
 
     // Ambient
     private sun!: Sun;
@@ -117,6 +119,9 @@ export class Scene {
         });
         
         this.keyboardControls = new KeyboardControls(this.controls);
+        
+        this.collisionDetector = new CollisionDetector(this.scene);
+        this.keyboardControls.setCollisionDetector(this.collisionDetector);
     }
 
     public getSun(): Sun {
@@ -138,6 +143,10 @@ export class Scene {
     public getClocks(): Clocks {
         return this.clocks;
     }
+
+    // public getCollisionDetector(): CollisionDetector {
+    //     return this.collisionDetector;
+    // }
 
     public animate() {
         this.keyboardControls.update();
