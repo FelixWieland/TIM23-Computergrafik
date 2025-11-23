@@ -16,6 +16,7 @@ import { Water } from './ambient/water';
 import { KeyboardControls } from './controls/keyboard-controls';
 import { Clocks } from './nodes/clocks';
 import { CollisionDetector } from './controls/collision-detector';
+import { TourAnimator } from './tours/tour-animator';
 
 export class Scene {
     private scene: THREE.Scene;
@@ -24,6 +25,8 @@ export class Scene {
     private controls!: PointerLockControls;
     private keyboardControls!: KeyboardControls;
     private collisionDetector!: CollisionDetector;
+
+    private tourAnimator: TourAnimator | null = null;
 
     // Ambient
     private sun!: Sun;
@@ -76,33 +79,22 @@ export class Scene {
     private setupDebugLighting() {
         // return;
         
-        // Add ambient light for overall illumination
         const ambientLight = new THREE.AmbientLight(0x404040, 0.3);
         this.scene.add(ambientLight);
-        
-        
-        // Add bright debugging light for building visibility
         const debugLight = new THREE.DirectionalLight(0xffffff, 1.0);
         debugLight.position.set(100, 100, 100);
         debugLight.target.position.set(0, 0, 0);
         debugLight.castShadow = false; // Disable shadows for debugging
         this.scene.add(debugLight);
         this.scene.add(debugLight.target);
-        
-        // Add additional ambient light for debugging
         const debugAmbientLight = new THREE.AmbientLight(0xffffff, 0.8);
         this.scene.add(debugAmbientLight);
-        
-        console.log('Buildings: Debug lighting added - bright directional and ambient lights');
-        
-        // Note: Sun provides the main directional light
     }
 
     private setupCamera() {
         const distance = getReferenceDistance();
         this.camera.position.set(0, distance * 0.1, distance * 0.2);
         this.camera.lookAt(0, 1, 0);
-        // Set rotation order to YXZ for first-person camera to avoid gimbal lock
         this.camera.rotation.order = 'YXZ';
     }
 
@@ -154,9 +146,12 @@ export class Scene {
         return this.controls;
     }
 
+    public setTourAnimator(tourAnimator: TourAnimator): void {
+        this.tourAnimator = tourAnimator;
+    }
+
     public animate() {
         this.keyboardControls.update();
-        
         let solarInfo: { azimuth: number, elevation: number, isDay: boolean } | null = null;
         if (this.sun) {
             this.sun.update();
@@ -165,49 +160,45 @@ export class Scene {
                 this.fog.updateColorForSunElevation(solarInfo.elevation);
             }
         }
-        
         if (solarInfo && this.sun && this.clouds) {
             this.clouds.updateLightingForSun(solarInfo.elevation, this.sun.getSunMesh().position);
         }
         
         if (this.clouds) {
-            this.clouds.update();
+            this.clouds.animate();
         }
-        
+        if (this.tourAnimator) {
+            this.tourAnimator.animate();
+        }
         if (this.sky) {
             this.sky.animate();
         }
-        
         if (this.water) {
             this.water.animate();
         }
-
         if (this.clocks) {
             this.clocks.animate();
         }
-
         if (this.churches) {
             this.churches.animate();
         }
-
         if (this.trees) {
             this.trees.animate();
         }
-
         if (this.cityWall) {
             this.cityWall.animate();
         }
-
         if (this.houses) {
             this.houses.animate();
         }
-
         if (this.gardens) {
             this.gardens.animate();
         }
-
         if (this.lanterns) {
             this.lanterns.animate();
+        }
+        if (this.trees) {
+            this.terrain.animate();
         }
     }
 }

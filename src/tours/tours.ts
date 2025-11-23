@@ -32,7 +32,7 @@ export const tours: Tour[] = [
                 colorIntensity: 10.0000,
                 fogValue: 0.000000,
                 dateTime: new Date(2025, 10, 23, 22, 12), // 22:12
-                duration: 5.0
+                duration: 5000
             },
             {
                 position: new THREE.Vector3(-293.3460, 65.7031, 31.3497),
@@ -46,7 +46,7 @@ export const tours: Tour[] = [
                 colorIntensity: 10.0000,
                 fogValue: 0.0052,
                 dateTime: new Date(2025, 10, 24, 10, 0), // 10:00
-                duration: 5.0
+                duration: 5000
             },
         ]
     ),

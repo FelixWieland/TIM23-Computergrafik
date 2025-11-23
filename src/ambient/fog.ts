@@ -12,47 +12,28 @@ export class Fog {
     constructor(scene: THREE.Scene, color: number = 0xcccccc, density: number = 0.0) {
         this.scene = scene;
         this.density = density;
-        
-        // Create exponential fog (more realistic than linear fog)
+
         this.fog = new THREE.FogExp2(color, density);
         this.scene.fog = this.fog;
     }
 
-    /**
-     * Set the fog density
-     * @param density Fog density (0.0 = no fog, higher values = more fog)
-     */
     public setDensity(density: number): void {
-        this.density = Math.max(0, density); // Ensure non-negative
+        this.density = Math.max(0, density);
         this.fog.density = this.density;
     }
 
-    /**
-     * Get the current fog density
-     */
     public getDensity(): number {
         return this.density;
     }
 
-    /**
-     * Set the fog color
-     * @param color Fog color (hex value)
-     */
     public setColor(color: number): void {
         this.fog.color.setHex(color);
     }
 
-    /**
-     * Get the fog color
-     */
     public getColor(): THREE.Color {
         return this.fog.color;
     }
 
-    /**
-     * Update the fog color based on the sun elevation to avoid glowing fog at night.
-     * @param elevation Current sun elevation in degrees
-     */
     public updateColorForSunElevation(elevation: number): void {
         if (!isFinite(elevation)) {
             return;

@@ -3,8 +3,8 @@ import * as THREE from 'three';
 export interface TourParameter {
     position?: THREE.Vector3;
     cameraRotation?: {
-        pitch: number; // in radians
-        yaw: number;   // in radians
+        pitch: number;
+        yaw: number;
     };
     cloudMovementSpeed?: number;
     cloudAmount?: number;
@@ -12,7 +12,7 @@ export interface TourParameter {
     colorIntensity?: number;
     fogValue?: number;
     dateTime?: Date;
-    duration: number; // in seconds - required for each parameter
+    duration: number; // in ms
 }
 
 export class Tour {

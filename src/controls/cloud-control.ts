@@ -6,17 +6,17 @@ export class CloudControl {
     private amountSliderTrack: HTMLElement;
     private amountSliderHandle: HTMLElement;
     private amountSliderFill: HTMLElement;
-    // private cloudIcon: HTMLElement;
+
     private speedDisplay: HTMLElement;
     private amountDisplay: HTMLElement;
     private onSpeedChangeCallback?: (speed: number) => void;
     private onAmountChangeCallback?: (amount: number) => void;
     private isDraggingSpeed: boolean = false;
     private isDraggingAmount: boolean = false;
-    private currentSpeed: number = 0.2; // Default movement speed
-    private currentAmount: number = 0.7; // Default cloud amount (coverage)
-    private maxSpeed: number = 2.0; // Maximum movement speed
-    private maxAmount: number = 1.0; // Maximum cloud amount
+    private currentSpeed: number = 0.2; 
+    private currentAmount: number = 0.7;
+    private maxSpeed: number = 2.0; 
+    private maxAmount: number = 1.0;
 
     constructor() {
         this.sliderContainer = document.getElementById('cloud-control-slider') as HTMLElement;
@@ -26,7 +26,6 @@ export class CloudControl {
         this.amountSliderTrack = document.getElementById('cloud-amount-track') as HTMLElement;
         this.amountSliderHandle = document.getElementById('cloud-amount-handle') as HTMLElement;
         this.amountSliderFill = document.getElementById('cloud-amount-fill') as HTMLElement;
-        // this.cloudIcon = document.getElementById('cloud-icon') as HTMLElement;
         this.speedDisplay = document.getElementById('cloud-speed-display') as HTMLElement;
         this.amountDisplay = document.getElementById('cloud-amount-display') as HTMLElement;
 
@@ -36,7 +35,6 @@ export class CloudControl {
     }
 
     private setupEventListeners(): void {
-        // Speed slider track clicks
         this.speedSliderTrack.addEventListener('click', (e) => {
             e.stopPropagation();
             if (e.target === this.speedSliderTrack) {
@@ -44,7 +42,6 @@ export class CloudControl {
             }
         });
 
-        // Amount slider track clicks
         this.amountSliderTrack.addEventListener('click', (e) => {
             e.stopPropagation();
             if (e.target === this.amountSliderTrack) {
@@ -52,19 +49,16 @@ export class CloudControl {
             }
         });
 
-        // Speed handle dragging
         this.speedSliderHandle.addEventListener('mousedown', (e) => {
             e.stopPropagation();
             this.startDraggingSpeed(e);
         });
 
-        // Amount handle dragging
         this.amountSliderHandle.addEventListener('mousedown', (e) => {
             e.stopPropagation();
             this.startDraggingAmount(e);
         });
 
-        // Touch events for mobile
         this.speedSliderHandle.addEventListener('touchstart', (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -77,12 +71,10 @@ export class CloudControl {
             this.startDraggingAmount(e.touches[0]);
         });
 
-        // Prevent clicks inside the slider container from closing it
         this.sliderContainer.addEventListener('click', (e) => {
             e.stopPropagation();
         });
 
-        // Global mouse/touch events for dragging
         document.addEventListener('mousemove', (e) => {
             if (this.isDraggingSpeed) {
                 this.handleSpeedDrag(e);
@@ -109,7 +101,6 @@ export class CloudControl {
             this.stopDragging();
         });
 
-        // Close slider when clicking outside
         document.addEventListener('click', (e) => {
             const cloudButton = document.getElementById('cloud-control');
             const isOutsideSlider = !this.sliderContainer.contains(e.target as Node);
@@ -120,7 +111,6 @@ export class CloudControl {
             }
         });
 
-        // Close with Escape key
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && this.isOpen()) {
                 this.close();

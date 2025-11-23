@@ -287,7 +287,7 @@ export class Clouds {
         this.scene.add(this.mesh);
     }
 
-    public update() {
+    public animate() {
         if (!this.material) return;
 
         const now = performance.now();

@@ -3,19 +3,17 @@ export class FogSlider {
     private sliderTrack: HTMLElement;
     private sliderHandle: HTMLElement;
     private sliderFill: HTMLElement;
-    // private fogIcon: HTMLElement;
     private densityDisplay: HTMLElement;
     private onDensityChangeCallback?: (density: number) => void;
     private isDragging: boolean = false;
-    private currentDensity: number = 0.0; // Default: no fog
-    private maxDensity: number = 0.01; // Maximum fog density (reasonable value for FogExp2)
+    private currentDensity: number = 0.0; 
+    private maxDensity: number = 0.01;
 
     constructor() {
         this.sliderContainer = document.getElementById('fog-slider') as HTMLElement;
         this.sliderTrack = this.sliderContainer.querySelector('.time-slider-track') as HTMLElement;
         this.sliderHandle = document.getElementById('fog-slider-handle') as HTMLElement;
         this.sliderFill = this.sliderContainer.querySelector('.time-slider-fill') as HTMLElement;
-        // this.fogIcon = document.getElementById('fog-icon') as HTMLElement;
         this.densityDisplay = document.getElementById('fog-density-display') as HTMLElement;
 
         this.setupEventListeners();
@@ -24,39 +22,30 @@ export class FogSlider {
     }
 
     private setupEventListeners(): void {
-        // Handle slider track clicks
         this.sliderTrack.addEventListener('click', (e) => {
             e.stopPropagation();
             if (e.target === this.sliderTrack) {
                 this.handleTrackClick(e);
             }
         });
-
-        // Handle handle dragging
         this.sliderHandle.addEventListener('mousedown', (e) => {
             e.stopPropagation();
             this.startDragging(e);
         });
-
-        // Handle touch events for mobile
         this.sliderHandle.addEventListener('touchstart', (e) => {
             e.preventDefault();
             e.stopPropagation();
             this.startDragging(e.touches[0]);
         });
-
-        // Prevent clicks inside the slider container from closing it
         this.sliderContainer.addEventListener('click', (e) => {
             e.stopPropagation();
         });
 
-        // Global mouse/touch events for dragging
         document.addEventListener('mousemove', (e) => {
             if (this.isDragging) {
                 this.handleDrag(e);
             }
         });
-
         document.addEventListener('touchmove', (e) => {
             if (this.isDragging) {
                 e.preventDefault();
@@ -67,23 +56,17 @@ export class FogSlider {
         document.addEventListener('mouseup', () => {
             this.stopDragging();
         });
-
         document.addEventListener('touchend', () => {
             this.stopDragging();
         });
-
-        // Close slider when clicking outside
         document.addEventListener('click', (e) => {
             const fogButton = document.getElementById('fog-control');
             const isOutsideSlider = !this.sliderContainer.contains(e.target as Node);
             const isNotFogButton = e.target !== fogButton;
-            
             if (isOutsideSlider && isNotFogButton && this.isOpen()) {
                 this.close();
             }
         });
-
-        // Close with Escape key
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && this.isOpen()) {
                 this.close();

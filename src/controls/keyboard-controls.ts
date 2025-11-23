@@ -3,7 +3,6 @@ import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockCont
 import { CollisionDetector } from './collision-detector';
 
 export class KeyboardControls {
-    // Movement flags
     private moveForward = false;
     private moveBackward = false;
     private moveLeft = false;
@@ -21,7 +20,6 @@ export class KeyboardControls {
     private controls: PointerLockControls;
     private onKeyDownHandler: (event: KeyboardEvent) => void;
     private onKeyUpHandler: (event: KeyboardEvent) => void;
-    private saveIntervalId: number | null = null;
     private collisionDetector: CollisionDetector | null = null;
 
     constructor(controls: PointerLockControls) {
@@ -31,12 +29,6 @@ export class KeyboardControls {
         
         document.addEventListener('keydown', this.onKeyDownHandler);
         document.addEventListener('keyup', this.onKeyUpHandler);
-        
-        this.restoreCameraState();
-        
-        this.saveIntervalId = window.setInterval(() => this.saveCameraState(), 1000);
-        
-        this.controls.addEventListener('unlock', () => this.saveCameraState());
     }
 
     private handleKeyDown(event: KeyboardEvent): void {
@@ -65,10 +57,12 @@ export class KeyboardControls {
                 this.moveDown = true;
                 break;
             case 'Enter':
-                // Exit pointer lock when Enter is pressed
                 if (this.controls.isLocked) {
                     this.controls.unlock();
                 }
+                break;
+            case 'KeyI':
+                this.toggleUI()
                 break;
         }
     }
@@ -100,6 +94,16 @@ export class KeyboardControls {
                 break;
             case 'KeyT':
                 break;
+        }
+    }
+
+    private toggleUI(): void {
+        const statsPanel = document.getElementById('stats-panel');
+        const controls = document.getElementsByClassName('controls');
+
+        const elements = [statsPanel!, ...controls] as HTMLElement[];
+        for (const element of elements) {
+            element.style.display = element.style.display === 'none' ? 'flex' : 'none';
         }
     }
 
@@ -194,60 +198,6 @@ export class KeyboardControls {
         this.prevTime = time;
     }
 
-    private saveCameraState(): void {
-        return;
-        const camera = this.controls.object;
-        const position = camera.position;
-        const rotation = camera.rotation;
-        
-        const cameraState = {
-            position: {
-                x: position.x,
-                y: position.y,
-                z: position.z
-            },
-            rotation: {
-                x: rotation.x,
-                y: rotation.y,
-                z: rotation.z
-            }
-        };
-        
-        try {
-            sessionStorage.setItem('cameraState', JSON.stringify(cameraState));
-        } catch (error) {
-            console.warn('Failed to save camera state to session storage:', error);
-        }
-    }
-
-    private restoreCameraState(): void {
-        try {
-            const savedState = sessionStorage.getItem('cameraState');
-            if (savedState) {
-                const cameraState = JSON.parse(savedState);
-                const camera = this.controls.object;
-                
-                if (cameraState.position) {
-                    camera.position.set(
-                        cameraState.position.x,
-                        cameraState.position.y,
-                        cameraState.position.z
-                    );
-                }
-                
-                if (cameraState.rotation) {
-                    camera.rotation.set(
-                        cameraState.rotation.x,
-                        cameraState.rotation.y,
-                        cameraState.rotation.z
-                    );
-                }
-            }
-        } catch (error) {
-            console.warn('Failed to restore camera state from session storage:', error);
-        }
-    }
-
     public setCollisionDetector(detector: CollisionDetector | null): void {
         this.collisionDetector = detector;
     }
@@ -255,11 +205,6 @@ export class KeyboardControls {
     public dispose(): void {
         document.removeEventListener('keydown', this.onKeyDownHandler);
         document.removeEventListener('keyup', this.onKeyUpHandler);
-        
-        if (this.saveIntervalId !== null) {
-            clearInterval(this.saveIntervalId);
-            this.saveIntervalId = null;
-        }
     }
 }
 

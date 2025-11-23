@@ -57,21 +57,17 @@ export class CopySettingsControl {
         const distance = getReferenceDistance();
         const pos = this.camera.position;
         
-        // Get current time from time picker
         const currentTime = this.timePicker.getTime();
         const hours = Math.floor(currentTime);
         const minutes = Math.floor((currentTime - hours) * 60);
         const now = new Date();
         const dateTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes);
 
-        // Format the position using distance multiplier if possible
         const formatPosition = (pos: THREE.Vector3): string => {
-            // Try to find a simple multiplier
             const xRatio = pos.x / distance;
             const yRatio = pos.y / distance;
             const zRatio = pos.z / distance;
             
-            // Round to 1 decimal place and check if it's close
             const roundTo1Decimal = (val: number) => Math.round(val * 10) / 10;
             const tolerance = 0.001;
             
@@ -82,7 +78,6 @@ export class CopySettingsControl {
             if (Math.abs(xRatio - xRounded) < tolerance &&
                 Math.abs(yRatio - yRounded) < tolerance &&
                 Math.abs(zRatio - zRounded) < tolerance) {
-                // Format with distance multiplier (matching tours.ts format)
                 const formatComponent = (val: number) => {
                     if (val === 0) return '0';
                     if (val === 1) return 'distance';
@@ -90,11 +85,9 @@ export class CopySettingsControl {
                 };
                 return `new THREE.Vector3(${formatComponent(xRounded)}, ${formatComponent(yRounded)}, ${formatComponent(zRounded)})`;
             }
-            // Otherwise use exact values
             return `new THREE.Vector3(${pos.x.toFixed(4)}, ${pos.y.toFixed(4)}, ${pos.z.toFixed(4)})`;
         };
 
-        // Build the parameter object
         const parameterLines: string[] = [];
         
         parameterLines.push(`                position: ${formatPosition(pos)},`);
@@ -112,20 +105,7 @@ export class CopySettingsControl {
 
         const code = `            {\n${parameterLines.join('\n')}\n            },`;
 
-        // Copy to clipboard
-        navigator.clipboard.writeText(code).then(() => {
-            console.log('Settings copied to clipboard');
-            // Visual feedback
-            const originalHTML = this.button.innerHTML;
-            this.button.innerHTML = `
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="20,6 9,17 4,12"></polyline>
-                </svg>
-            `;
-            setTimeout(() => {
-                this.button.innerHTML = originalHTML;
-            }, 1000);
-        }).catch((err) => {
+        navigator.clipboard.writeText(code).catch((err) => {
             console.error('Failed to copy settings:', err);
         });
     }

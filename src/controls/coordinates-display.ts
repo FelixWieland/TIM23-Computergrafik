@@ -16,11 +16,11 @@ export class CoordinatesDisplay {
         this.displayElement.addEventListener('click', () => {
             const textToCopy = this.displayElement.textContent;
             if (textToCopy) {
-                navigator.clipboard.writeText(textToCopy);
+                navigator.clipboard.writeText(textToCopy).catch((err) => {
+                    console.error('Failed to copy coordinates:', err);
+                });
             }
         });
-
-        // Initialize with current position
         this.update();
     }
 
@@ -32,11 +32,9 @@ export class CoordinatesDisplay {
         const y = pos.y.toFixed(2);
         const z = pos.z.toFixed(2);
 
-        // Get rotation angles (Euler angles in radians, convert to degrees)
         const pitch = THREE.MathUtils.radToDeg(this.camera.rotation.x).toFixed(1);
         const yaw = THREE.MathUtils.radToDeg(this.camera.rotation.y).toFixed(1);
 
-        // Format: Position (x, y, z) | Rotation (pitch, yaw)
         this.displayElement.textContent = `${x}, ${y}, ${z} | ${pitch}°, ${yaw}°`;
     }
 }

@@ -13,12 +13,9 @@ export class FullscreenControl {
     }
 
     private setupEventListeners(): void {
-        // Handle button click
         this.fullscreenButton.addEventListener('click', () => {
             this.toggleFullscreen();
         });
-
-        // Handle fullscreen changes (including vendor prefixes)
         document.addEventListener('fullscreenchange', () => {
             this.updateIcon();
         });

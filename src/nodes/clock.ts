@@ -41,7 +41,6 @@ export class Clock {
         this.clockGroup.add(minutehandGltf.scene);
         this.clockGroup.add(hourhandGltf.scene);
 
-        // Store references to the hand meshes
         this.minuteHandMesh = minutehandGltf.scene;
         this.hourHandMesh = hourhandGltf.scene;
 
@@ -58,8 +57,7 @@ export class Clock {
 
     public animate() {
         if (this.clockGroup === null || this.minuteHandMesh === null || this.hourHandMesh === null) return;
-        console.log("Animating clock", this.customDate.toLocaleTimeString());
-        // Get hours and minutes from customDate
+ 
         const hours = this.customDate.getHours() + 3;
         const minutes = this.customDate.getMinutes() +15;
         const seconds = this.customDate.getSeconds();

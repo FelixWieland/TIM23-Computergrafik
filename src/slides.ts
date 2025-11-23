@@ -25,26 +25,18 @@ export class Slideshow {
     }
 
     private init(): void {
-        // Set up the slideshow container for horizontal scrolling
         this.slideshow.style.display = 'flex';
         this.slideshow.style.flexDirection = 'row';
         this.slideshow.style.gap = '0px';
         this.slideshow.style.transition = 'transform 0.3s ease-in-out';
         this.slideshow.style.transform = 'translateX(0)';
-        
-        // Calculate dimensions with fallback
+
         this.calculateAndSetDimensions();
 
-        // Set initial slide data attribute
         this.slideshow.setAttribute('data-slide', this.currentSlide.toString());
-
-        // Add keyboard event listeners
         document.addEventListener('keydown', this.handleKeyDown.bind(this));
-
-        // Add debounced window resize listener
         window.addEventListener('resize', this.handleResize.bind(this));
 
-        // Update the slideshow position
         this.updateSlidePosition();
     }
 
@@ -62,7 +54,6 @@ export class Slideshow {
     }
 
     private calculateAndSetDimensions(): void {
-        // Get window dimensions with fallback
         const slideWidth = window.innerWidth || document.documentElement.clientWidth || 1024;
         const totalWidth = this.totalSlides * slideWidth;
         
@@ -75,7 +66,6 @@ export class Slideshow {
     }
 
     private handleResize(): void {
-        // Debounce resize events to prevent excessive calculations
         if (this.resizeTimeout) {
             clearTimeout(this.resizeTimeout);
         }

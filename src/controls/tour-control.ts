@@ -5,7 +5,7 @@ export class TourControl {
     private tourListContainer: HTMLElement;
     private onTourSelectCallback?: (tour: Tour) => void;
 
-    constructor() {
+    constructor(tours: Tour[] = []) {
         this.popupContainer = document.getElementById('tours-popup') as HTMLElement;
         this.tourListContainer = document.getElementById('tours-list') as HTMLElement;
 
@@ -14,27 +14,25 @@ export class TourControl {
             return;
         }
 
+        if (tours.length > 0) {
+            this.setTours(tours);
+        }
+
         this.setupEventListeners();
     }
 
     private setupEventListeners(): void {
-        // Prevent clicks inside the popup from closing it
         this.popupContainer.addEventListener('click', (e) => {
             e.stopPropagation();
         });
-
-        // Close popup when clicking outside
         document.addEventListener('click', (e) => {
             const toursButton = document.getElementById('tours-control');
             const isOutsidePopup = !this.popupContainer.contains(e.target as Node);
             const isNotToursButton = e.target !== toursButton;
-            
             if (isOutsidePopup && isNotToursButton && this.isOpen()) {
                 this.close();
             }
         });
-
-        // Close with Escape key
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && this.isOpen()) {
                 this.close();
@@ -43,10 +41,7 @@ export class TourControl {
     }
 
     public setTours(tours: Tour[]): void {
-        // Clear existing tours
         this.tourListContainer.innerHTML = '';
-
-        // Create tour items
         tours.forEach((tour) => {
             const tourItem = document.createElement('div');
             tourItem.className = 'tour-item';
@@ -54,11 +49,9 @@ export class TourControl {
                 <div class="tour-item-name">${tour.name}</div>
                 <div class="tour-item-description">${tour.description}</div>
             `;
-            
             tourItem.addEventListener('click', () => {
                 this.selectTour(tour);
             });
-
             this.tourListContainer.appendChild(tourItem);
         });
     }

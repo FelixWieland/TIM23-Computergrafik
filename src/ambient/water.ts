@@ -47,7 +47,7 @@ export class Water {
             "/textures/waternormals.jpg",
             (texture) => {
                 texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-                texture.repeat.set(4, 4); // Repeat the texture for tiling
+                texture.repeat.set(4, 4);
             }
         );
         const waterMaterial = new THREE.MeshStandardMaterial({
@@ -102,9 +102,7 @@ export class Water {
 
     public animate() {
         if (this.waterLayers.length === 0) return;
-
         this.time += 0.05;
-
         for (const layer of this.waterLayers) {
             const offsetTime = this.time + layer.animationOffset;
             layer.normals.offset.x = Math.sin(offsetTime * 3.0) * 0.001;
