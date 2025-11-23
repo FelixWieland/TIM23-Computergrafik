@@ -14,6 +14,7 @@ import { Trees } from './nodes/trees';
 import { Lanterns } from './nodes/lanterns';
 import { Water } from './ambient/water';
 import { KeyboardControls } from './controls/keyboard-controls';
+import { Clocks } from './nodes/clocks';
 
 export class Scene {
     private scene: THREE.Scene;
@@ -30,19 +31,14 @@ export class Scene {
     private water!: Water;
 
     // Nodes
-    // @ts-ignore
     private churches!: Churches
-    // @ts-ignore
     private terrain!: Terrain
-    // @ts-ignore
     private gardens!: Gardens
-    // @ts-ignore
     private houses!: Houses
-    // @ts-ignore
     private trees!: Trees
-    // @ts-ignore
     private cityWall!: CityWall
     private lanterns!: Lanterns
+    private clocks!: Clocks
 
     constructor(scene: THREE.Scene, camera: THREE.PerspectiveCamera, renderer: THREE.WebGLRenderer) {
         this.scene = scene;
@@ -72,10 +68,11 @@ export class Scene {
         this.houses = new Houses(this.scene)
         this.gardens = new Gardens(this.scene)
         this.lanterns = new Lanterns(this.scene)
+        this.clocks = new Clocks(this.scene)
     }
 
     private setupDebugLighting() {
-        return;
+        // return;
         
         // Add ambient light for overall illumination
         const ambientLight = new THREE.AmbientLight(0x404040, 0.3);
@@ -138,6 +135,10 @@ export class Scene {
         return this.lanterns;
     }
 
+    public getClocks(): Clocks {
+        return this.clocks;
+    }
+
     public animate() {
         this.keyboardControls.update();
         
@@ -158,14 +159,40 @@ export class Scene {
             this.clouds.update();
         }
         
-        // Update sky
         if (this.sky) {
             this.sky.animate();
         }
         
-        // Update water
         if (this.water) {
             this.water.animate();
+        }
+
+        if (this.clocks) {
+            this.clocks.animate();
+        }
+
+        if (this.churches) {
+            this.churches.animate();
+        }
+
+        if (this.trees) {
+            this.trees.animate();
+        }
+
+        if (this.cityWall) {
+            this.cityWall.animate();
+        }
+
+        if (this.houses) {
+            this.houses.animate();
+        }
+
+        if (this.gardens) {
+            this.gardens.animate();
+        }
+
+        if (this.lanterns) {
+            this.lanterns.animate();
         }
     }
 }

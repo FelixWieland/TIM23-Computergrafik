@@ -20,6 +20,7 @@ export class KeyboardControls {
     private controls: PointerLockControls;
     private onKeyDownHandler: (event: KeyboardEvent) => void;
     private onKeyUpHandler: (event: KeyboardEvent) => void;
+    private saveIntervalId: number | null = null;
 
     constructor(controls: PointerLockControls) {
         this.controls = controls;
@@ -28,6 +29,15 @@ export class KeyboardControls {
         
         document.addEventListener('keydown', this.onKeyDownHandler);
         document.addEventListener('keyup', this.onKeyUpHandler);
+        
+        // Restore camera position and rotation from session storage
+        this.restoreCameraState();
+        
+        // Save camera state periodically (every second)
+        this.saveIntervalId = window.setInterval(() => this.saveCameraState(), 1000);
+        
+        // Also save when controls are unlocked
+        this.controls.addEventListener('unlock', () => this.saveCameraState());
     }
 
     private handleKeyDown(event: KeyboardEvent): void {
@@ -109,11 +119,11 @@ export class KeyboardControls {
             this.direction.x = Number(this.moveRight) - Number(this.moveLeft);
             this.direction.normalize();
 
-            if (this.moveForward || this.moveBackward) this.velocity.z -= this.direction.z * 400.0 * 4 * delta;
-            if (this.moveLeft || this.moveRight) this.velocity.x -= this.direction.x * 400.0 * 4 * delta;
+            if (this.moveForward || this.moveBackward) this.velocity.z -= this.direction.z * 100.0 * 4 * delta;
+            if (this.moveLeft || this.moveRight) this.velocity.x -= this.direction.x * 100.0 * 4 * delta;
 
-            if (this.moveUp) this.velocity.y += 400.0 * 4 * delta; // Fly up
-            if (this.moveDown) this.velocity.y -= 400.0 * 4 * delta; // Fly down
+            if (this.moveUp) this.velocity.y += 100.0 * 4 * delta; // Fly up
+            if (this.moveDown) this.velocity.y -= 100.0 * 4 * delta; // Fly down
 
             this.controls.moveRight(-this.velocity.x * delta);
             this.controls.moveForward(-this.velocity.z * delta);
@@ -123,10 +133,73 @@ export class KeyboardControls {
         this.prevTime = time;
     }
 
+    // Save camera position and rotation to session storage
+    private saveCameraState(): void {
+        const camera = this.controls.object;
+        const position = camera.position;
+        const rotation = camera.rotation;
+        
+        const cameraState = {
+            position: {
+                x: position.x,
+                y: position.y,
+                z: position.z
+            },
+            rotation: {
+                x: rotation.x,
+                y: rotation.y,
+                z: rotation.z
+            }
+        };
+        
+        try {
+            sessionStorage.setItem('cameraState', JSON.stringify(cameraState));
+        } catch (error) {
+            console.warn('Failed to save camera state to session storage:', error);
+        }
+    }
+
+    // Restore camera position and rotation from session storage
+    private restoreCameraState(): void {
+        try {
+            const savedState = sessionStorage.getItem('cameraState');
+            if (savedState) {
+                const cameraState = JSON.parse(savedState);
+                const camera = this.controls.object;
+                
+                // Restore position
+                if (cameraState.position) {
+                    camera.position.set(
+                        cameraState.position.x,
+                        cameraState.position.y,
+                        cameraState.position.z
+                    );
+                }
+                
+                // Restore rotation
+                if (cameraState.rotation) {
+                    camera.rotation.set(
+                        cameraState.rotation.x,
+                        cameraState.rotation.y,
+                        cameraState.rotation.z
+                    );
+                }
+            }
+        } catch (error) {
+            console.warn('Failed to restore camera state from session storage:', error);
+        }
+    }
+
     // Cleanup method to remove event listeners
     public dispose(): void {
         document.removeEventListener('keydown', this.onKeyDownHandler);
         document.removeEventListener('keyup', this.onKeyUpHandler);
+        
+        // Clear the save interval
+        if (this.saveIntervalId !== null) {
+            clearInterval(this.saveIntervalId);
+            this.saveIntervalId = null;
+        }
     }
 }
 

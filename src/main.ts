@@ -8,6 +8,7 @@ import { FogSlider } from './controls/fog-slider.ts';
 import { CloudControl } from './controls/cloud-control.ts';
 import { LanternControl } from './controls/lantern-control.ts';
 import { FullscreenControl } from './controls/fullscreen-control.ts';
+import { CoordinatesDisplay } from './controls/coordinates-display.ts';
 
 import { getReferenceDistance } from './util';
 import Stats from 'three/examples/jsm/libs/stats.module.js';
@@ -64,6 +65,9 @@ function main() {
     // Create our custom scene class
     const customScene = new Scene(scene, camera, renderer);
 
+    // Coordinates Display
+    const coordinatesDisplay = new CoordinatesDisplay(camera);
+
     // Connect time picker to controls and sun
     controls.registerTimePickerButton(() => {
         timePicker.show();
@@ -87,7 +91,8 @@ function main() {
     // Handle time picker changes
     timePicker.onTimeChange((time: number) => {
         const sun = customScene.getSun();
-        
+        const clocks = customScene.getClocks();
+
         // Create a date with the selected time (using current date)
         const now = new Date();
         const hours = Math.floor(time);
@@ -96,6 +101,9 @@ function main() {
         
         // Apply the custom time to the sun
         sun.setCustomDateTime(customDate);
+        clocks.setCustomDateTime(customDate);
+
+
         
         console.log(`Sun time set to: ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`);
     });
@@ -164,6 +172,7 @@ function main() {
         stats.begin();
         requestAnimationFrame(animate);
         customScene.animate();
+        coordinatesDisplay.update();
         renderer.render(scene, camera);
         stats.end();
     }
