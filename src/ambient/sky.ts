@@ -4,18 +4,31 @@ import { Sky as ThreeSky } from 'three/examples/jsm/objects/Sky.js';
 import { getReferenceDistance } from '../util';
 import type { Sun } from './sun';
 
+/**
+ * Creates and manages a realistic sky dome with atmospheric scattering.
+ * The sky changes appearance based on sun position, showing proper colors for day and night.
+ */
 export class Sky {
     scene: Scene
     sky!: ThreeSky
     skySun!: THREE.Vector3;
     sun: Sun;
 
+    /**
+     * Creates a new sky system that follows the sun's movement.
+     * @param scene The Three.js scene to add the sky to
+     * @param sun The sun controller that determines sky colors
+     */
     public constructor(scene: Scene, sun: Sun) {
         this.scene = scene;
         this.sun = sun;
         this.setup()
     }
 
+    /**
+     * Sets up the sky dome with initial atmospheric parameters.
+     * Configures turbidity, Rayleigh scattering, and other properties for realistic sky appearance.
+     */
     public setup() {
         this.sky = new ThreeSky();
         const distance = getReferenceDistance();
@@ -44,6 +57,10 @@ export class Sky {
         console.log(`Sun position: (${this.skySun.x.toFixed(3)}, ${this.skySun.y.toFixed(3)}, ${this.skySun.z.toFixed(3)})`);
     }
 
+    /**
+     * Updates the sky every frame to match the current sun position.
+     * Adjusts atmospheric parameters for realistic transitions between day and night.
+     */
     public animate() {        
         const sunPosition = this.sun.getSunMesh().position;
         

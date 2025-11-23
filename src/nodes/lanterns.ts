@@ -3,6 +3,10 @@ import { Group, PointLight, Box3, Mesh, MeshStandardMaterial, Color } from "thre
 import { Gltf } from "./gltf";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader.js";
 
+/**
+ * Manages lanterns placed throughout the scene with adjustable lighting.
+ * Each lantern has its own point light that can be configured for color warmth and intensity.
+ */
 export class Lanterns extends Gltf {
     scene: Scene;
     laternGltf: GLTF | null = null;
@@ -34,6 +38,10 @@ export class Lanterns extends Gltf {
         { x: 250, y: 0, z: 100 },
     ];
 
+    /**
+     * Creates the lantern system and starts loading lantern models.
+     * @param scene The Three.js scene to add lanterns to
+     */
     public constructor(scene: Scene) {
         super("/models/Lamp.optim.glb");
         this.scene = scene;
@@ -41,6 +49,13 @@ export class Lanterns extends Gltf {
         this.getGltf().then(this.setup.bind(this))
     }
 
+    /**
+     * Creates a single lantern with its light at a specific position.
+     * @param x X coordinate in world space
+     * @param y Y coordinate in world space
+     * @param z Z coordinate in world space
+     * @return The lantern group containing the model and light
+     */
     private createLantern(x: number, y: number, z: number): Group {
         if (!this.laternGltf) {
             throw new Error("GLTF not loaded yet");
@@ -57,6 +72,11 @@ export class Lanterns extends Gltf {
         return lanternClone;
     }
 
+    /**
+     * Converts basic materials to standard materials so they respond to lighting.
+     * This ensures lanterns look realistic under scene lighting.
+     * @param object The 3D object to update materials for
+     */
     private ensureMaterialsRespondToLights(object: Group) {
         object.traverse((child) => {
             if (child instanceof Mesh && child.material) {
@@ -89,6 +109,11 @@ export class Lanterns extends Gltf {
         });
     }
 
+    /**
+     * Adds a point light to a lantern positioned at the top of the lantern model.
+     * @param lanternClone The lantern object to add a light to
+     * @return The created point light
+     */
     private addLightToLantern(lanternClone: Group) {
         const box = new Box3().setFromObject(lanternClone);
         const topY = box.max.y+1;
@@ -105,6 +130,10 @@ export class Lanterns extends Gltf {
         return light;
     }
 
+    /**
+     * Creates all lantern instances at their predefined positions.
+     * @param gltf The loaded lantern GLTF model
+     */
     public setup(gltf: GLTF) {
         this.laternGltf = gltf;
 
@@ -117,6 +146,12 @@ export class Lanterns extends Gltf {
         this.scene.add(this.lanternGroup);
     }
 
+    /**
+     * Adds a new lantern at a custom position.
+     * @param x X coordinate
+     * @param y Y coordinate
+     * @param z Z coordinate
+     */
     public addLantern(x: number, y: number, z: number) {
         if (!this.laternGltf) return;
         
@@ -126,6 +161,10 @@ export class Lanterns extends Gltf {
         this.lanternPositions.push({ x, y, z });
     }
 
+    /**
+     * Adjusts the color temperature of all lantern lights.
+     * @param warmth Color warmth (0 = cool white, 1 = warm orange)
+     */
     public setWarmth(warmth: number) {
         const coolColor = new Color(0xffffff);
         const warmColor = new Color(0xffaa44);
@@ -136,12 +175,20 @@ export class Lanterns extends Gltf {
         });
     }
 
+    /**
+     * Changes how bright all lantern lights are.
+     * @param intensity Light intensity (higher = brighter)
+     */
     public setIntensity(intensity: number) {
         this.lights.forEach(light => {
             light.intensity = intensity;
         });
     }
 
+    /**
+     * Turns all lantern lights on or off.
+     * @param enabled Whether the lights should be on
+     */
     public setEnabled(enabled: boolean) {
         this.isEnabled = enabled;
         this.lights.forEach(light => {
@@ -149,10 +196,17 @@ export class Lanterns extends Gltf {
         });
     }
 
+    /**
+     * Checks if the lantern lights are currently enabled.
+     * @return True if lights are on, false if off
+     */
     public getEnabled(): boolean {
         return this.isEnabled;
     }
 
+    /**
+     * Updates the lanterns each frame (currently no animation).
+     */
     public animate() {
         if (this.laternGltf === null) return;
     }

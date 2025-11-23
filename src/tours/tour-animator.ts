@@ -6,6 +6,11 @@ import { CloudControl } from '../controls/cloud-control';
 import { LanternControl } from '../controls/lantern-control';
 import { TimePicker } from '../controls/time-picker';
 
+/**
+ * Handles animating tour parameters with smooth transitions.
+ * Animates camera position, rotation, and all scene settings between tour steps using easing functions.
+ * Each animation runs until complete, then resolves a promise to allow chaining tour steps.
+ */
 export class TourAnimator {
     private isAnimatingTour: boolean = false;
     private wasPointerLocked: boolean = false;
@@ -38,10 +43,24 @@ export class TourAnimator {
     private targetIntensity: number = 0;
     private targetDateTime: Date = new Date();
 
+    /**
+     * Performs linear interpolation between two numbers.
+     * @param start Starting value
+     * @param end Ending value
+     * @param t Progress from 0 to 1
+     * @return Interpolated value
+     */
     private lerp(start: number, end: number, t: number): number {
         return start + (end - start) * t;
     }
 
+    /**
+     * Performs linear interpolation between two 3D vectors.
+     * @param start Starting vector
+     * @param end Ending vector
+     * @param t Progress from 0 to 1
+     * @return Interpolated vector
+     */
     private lerpVector3(start: THREE.Vector3, end: THREE.Vector3, t: number): THREE.Vector3 {
         return new THREE.Vector3(
             this.lerp(start.x, end.x, t),
@@ -50,12 +69,29 @@ export class TourAnimator {
         );
     }
 
+    /**
+     * Normalizes an angle to the range -PI to PI for smooth rotation interpolation.
+     * @param angle Angle in radians
+     * @return Normalized angle
+     */
     private normalizeAngle(angle: number): number {
         while (angle > Math.PI) angle -= 2 * Math.PI;
         while (angle < -Math.PI) angle += 2 * Math.PI;
         return angle;
     }
 
+    /**
+     * Starts animating to a new tour parameter step.
+     * Smoothly transitions camera, time, fog, clouds, and lanterns from current values to target values.
+     * @param parameter The tour step to animate to
+     * @param camera The camera to move
+     * @param customScene The scene manager
+     * @param timePicker Time picker control for updating time display
+     * @param fogSlider Fog slider control for updating fog UI
+     * @param cloudControl Cloud control for updating cloud UI
+     * @param lanternControl Lantern control for updating lantern UI
+     * @return Promise that resolves when animation completes
+     */
     public animateTourParameter(
         parameter: TourParameter,
         camera: THREE.PerspectiveCamera,
@@ -119,6 +155,11 @@ export class TourAnimator {
         });
     }
 
+    /**
+     * Updates the current tour animation for this frame.
+     * Interpolates all parameters based on elapsed time and applies easing.
+     * Call this every frame to keep tour animations smooth.
+     */
     public animate(): void {
         if (!this.isAnimatingTour || !this.parameter || !this.camera || !this.customScene) {
             return;

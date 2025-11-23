@@ -1,5 +1,8 @@
 import * as THREE from 'three';
 
+/**
+ * Information about a collision that was detected.
+ */
 export interface CollisionResult {
     hasCollision: boolean;
     hitPoint?: THREE.Vector3;
@@ -7,6 +10,10 @@ export interface CollisionResult {
     distance?: number;
 }
 
+/**
+ * Detects collisions between the player and scene objects to prevent walking through walls.
+ * Uses raycasting to check if movement would cause collisions and finds ground height.
+ */
 export class CollisionDetector {
     private scene: THREE.Scene;
     private raycaster: THREE.Raycaster;
@@ -14,12 +21,21 @@ export class CollisionDetector {
     private collisionRadius: number;
     private meshCacheDirty: boolean = true;
 
+    /**
+     * Creates a new collision detector for a scene.
+     * @param scene The Three.js scene containing objects to check collisions with
+     * @param collisionRadius How close the player can get to objects before colliding (in world units)
+     */
     constructor(scene: THREE.Scene, collisionRadius: number = 0.5) {
         this.scene = scene;
         this.raycaster = new THREE.Raycaster();
         this.collisionRadius = collisionRadius;
     }
 
+    /**
+     * Scans the scene and collects all meshes that should be checked for collisions.
+     * Meshes with `skipCollision` in userData are ignored.
+     */
     private collectCollisionMeshes(): void {
         this.collisionMeshes = [];
         
@@ -37,12 +53,22 @@ export class CollisionDetector {
         this.meshCacheDirty = false;
     }
 
+    /**
+     * Updates the list of collision meshes if it has been marked as dirty.
+     */
     private updateMeshCache(): void {
         if (this.meshCacheDirty) {
             this.collectCollisionMeshes();
         }
     }
 
+    /**
+     * Checks if moving from one position to another would cause a collision.
+     * Uses raycasting to detect obstacles along the path and near the destination.
+     * @param fromPosition Starting position
+     * @param toPosition Desired end position
+     * @return Collision information including whether a collision occurred
+     */
     public checkCollision(fromPosition: THREE.Vector3, toPosition: THREE.Vector3): CollisionResult {
         this.updateMeshCache();
 
@@ -102,12 +128,25 @@ export class CollisionDetector {
         return { hasCollision: false };
     }
 
+    /**
+     * Simple check if movement is possible without collisions.
+     * @param currentPosition Current position
+     * @param deltaMovement Movement vector to apply
+     * @return True if movement is allowed, false if it would collide
+     */
     public canMove(currentPosition: THREE.Vector3, deltaMovement: THREE.Vector3): boolean {
         const proposedPosition = currentPosition.clone().add(deltaMovement);
         const result = this.checkCollision(currentPosition, proposedPosition);
         return !result.hasCollision;
     }
 
+    /**
+     * Calculates how far the player can move before hitting an obstacle.
+     * If full movement would collide, returns a reduced movement that stops before the collision.
+     * @param currentPosition Current position
+     * @param deltaMovement Desired movement vector
+     * @return Actual allowed movement (may be less than requested if collision detected)
+     */
     public getAllowedMovement(currentPosition: THREE.Vector3, deltaMovement: THREE.Vector3): THREE.Vector3 {
         const proposedPosition = currentPosition.clone().add(deltaMovement);
         const result = this.checkCollision(currentPosition, proposedPosition);
@@ -123,18 +162,37 @@ export class CollisionDetector {
         return new THREE.Vector3(0, 0, 0);
     }
 
+    /**
+     * Marks the mesh cache as dirty so it will be rebuilt on next use.
+     * Call this when objects are added or removed from the scene.
+     */
     public invalidateCache(): void {
         this.meshCacheDirty = true;
     }
 
+    /**
+     * Changes how close the player can get to objects.
+     * @param radius New collision radius in world units
+     */
     public setCollisionRadius(radius: number): void {
         this.collisionRadius = radius;
     }
 
+    /**
+     * Gets the current collision radius.
+     * @return The collision radius in world units
+     */
     public getCollisionRadius(): number {
         return this.collisionRadius;
     }
 
+    /**
+     * Finds the height of the ground below a position by casting a ray downward.
+     * Used to keep the player standing on terrain.
+     * @param position Position to check ground height at
+     * @param maxDistance Maximum distance to search downward
+     * @return Ground height (Y coordinate) or null if no ground found
+     */
     public getGroundHeight(position: THREE.Vector3, maxDistance: number = 10): number | null {
         this.updateMeshCache();
         if (this.collisionMeshes.length === 0) {

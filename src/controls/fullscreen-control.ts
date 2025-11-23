@@ -1,8 +1,15 @@
+/**
+ * Manages fullscreen mode toggling with a button that shows the appropriate icon.
+ * Handles cross-browser fullscreen API differences.
+ */
 export class FullscreenControl {
     private fullscreenButton: HTMLButtonElement;
     private enterIcon: HTMLElement;
     private exitIcon: HTMLElement;
 
+    /**
+     * Creates a fullscreen control and sets up event listeners.
+     */
     constructor() {
         this.fullscreenButton = document.getElementById('fullscreen') as HTMLButtonElement;
         this.enterIcon = document.getElementById('fullscreen-enter') as HTMLElement;
@@ -12,6 +19,9 @@ export class FullscreenControl {
         this.updateIcon();
     }
 
+    /**
+     * Sets up event listeners for fullscreen changes across different browsers.
+     */
     private setupEventListeners(): void {
         this.fullscreenButton.addEventListener('click', () => {
             this.toggleFullscreen();
@@ -30,6 +40,9 @@ export class FullscreenControl {
         });
     }
 
+    /**
+     * Toggles between fullscreen and windowed mode.
+     */
     private toggleFullscreen(): void {
         if (!document.fullscreenElement) {
             document.documentElement.requestFullscreen().catch(err => {
@@ -42,6 +55,9 @@ export class FullscreenControl {
         }
     }
 
+    /**
+     * Switches between enter and exit fullscreen icons based on current state.
+     */
     private updateIcon(): void {
         if (this.enterIcon && this.exitIcon) {
             if (document.fullscreenElement) {
@@ -54,6 +70,10 @@ export class FullscreenControl {
         }
     }
 
+    /**
+     * Checks if the page is currently in fullscreen mode.
+     * @return True if fullscreen, false if windowed
+     */
     public isFullscreen(): boolean {
         return !!document.fullscreenElement;
     }

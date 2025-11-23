@@ -4,17 +4,29 @@ import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.j
 const loader = new GLTFLoader();
 loader.setMeshoptDecoder(MeshoptDecoder);
 
+/**
+ * Handles loading of 3D models in GLTF format.
+ * Provides a convenient wrapper around the GLTF loader with caching support.
+ */
 export class Gltf {
     url: string;
     gltf: Promise<GLTF>
     loadedGltf: GLTF | null = null;
 
-    
+    /**
+     * Creates a new GLTF model loader and starts loading the file.
+     * @param url Path to the GLTF or GLB file to load
+     */
     public constructor(url: string) {
         this.url = url;
         this.gltf = loader.loadAsync(url)
     }
 
+    /**
+     * Gets the loaded GLTF model, waiting for it to finish loading if necessary.
+     * Results are cached after first load for better performance.
+     * @return Promise that resolves to the loaded GLTF object
+     */
     public async getGltf() {
         if (this.loadedGltf !== null) return this.loadedGltf;
 

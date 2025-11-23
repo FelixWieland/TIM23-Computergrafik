@@ -1,3 +1,7 @@
+/**
+ * A UI control for selecting the time of day with a draggable slider.
+ * Changes the sun position and time displayed in the scene.
+ */
 export class TimePicker {
     private sliderContainer: HTMLElement;
     private sliderTrack: HTMLElement;
@@ -9,6 +13,9 @@ export class TimePicker {
     private isDragging: boolean = false;
     private currentTime: number = 12;
 
+    /**
+     * Creates a time picker UI and initializes it to the current real time.
+     */
     constructor() {
         this.sliderContainer = document.getElementById('time-picker-slider') as HTMLElement;
         this.sliderTrack = this.sliderContainer.querySelector('.time-slider-track') as HTMLElement;
@@ -21,6 +28,9 @@ export class TimePicker {
         this.initializeWithCurrentTime();
     }
 
+    /**
+     * Sets up all mouse, touch, and keyboard event handlers for the time picker.
+     */
     private setupEventListeners(): void {
         this.sliderTrack.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -72,6 +82,9 @@ export class TimePicker {
         });
     }
 
+    /**
+     * Sets the time picker to show the current real-world time.
+     */
     private initializeWithCurrentTime(): void {
         const now = new Date();
         this.currentTime = now.getHours() + now.getMinutes() / 60;
@@ -80,6 +93,9 @@ export class TimePicker {
         this.updateIcon();
     }
 
+    /**
+     * Makes the time picker visible with a smooth animation.
+     */
     public show(): void {
         this.sliderContainer.style.display = 'block';
         requestAnimationFrame(() => {
@@ -87,6 +103,9 @@ export class TimePicker {
         });
     }
 
+    /**
+     * Hides the time picker with a smooth animation.
+     */
     public close(): void {
         this.sliderContainer.classList.remove('show');
         setTimeout(() => {
@@ -94,10 +113,18 @@ export class TimePicker {
         }, 300);
     }
 
+    /**
+     * Checks if the time picker is currently visible.
+     * @return True if visible, false if hidden
+     */
     public isOpen(): boolean {
         return this.sliderContainer.classList.contains('show');
     }
 
+    /**
+     * Begins dragging the time slider handle.
+     * @param e Mouse or touch event
+     */
     private startDragging(e: MouseEvent | Touch): void {
         this.isDragging = true;
         this.sliderHandle.style.cursor = 'grabbing';
@@ -106,6 +133,10 @@ export class TimePicker {
         }
     }
 
+    /**
+     * Handles dragging the slider handle to change the time.
+     * @param e Mouse or touch event with position
+     */
     private handleDrag(e: MouseEvent | Touch): void {
         if (!this.isDragging) return;
 
@@ -120,11 +151,18 @@ export class TimePicker {
         this.notifyTimeChange();
     }
 
+    /**
+     * Ends dragging the slider handle.
+     */
     private stopDragging(): void {
         this.isDragging = false;
         this.sliderHandle.style.cursor = 'grab';
     }
 
+    /**
+     * Handles clicking on the slider track to jump to a specific time.
+     * @param e Mouse event with click position
+     */
     private handleTrackClick(e: MouseEvent): void {
         const rect = this.sliderTrack.getBoundingClientRect();
         const x = e.clientX - rect.left;
@@ -137,12 +175,18 @@ export class TimePicker {
         this.notifyTimeChange();
     }
 
+    /**
+     * Updates the slider handle and fill to match the current time.
+     */
     private updateSlider(): void {
         const percentage = (this.currentTime / 24) * 100;
         this.sliderHandle.style.left = `${percentage}%`;
         this.sliderFill.style.width = `${percentage}%`;
     }
 
+    /**
+     * Updates the text display showing the current time in HH:MM format.
+     */
     private updateTimeDisplay(): void {
         const hours = Math.floor(this.currentTime);
         const minutes = Math.floor((this.currentTime - hours) * 60);
@@ -150,6 +194,9 @@ export class TimePicker {
         this.timeDisplay.textContent = timeString;
     }
 
+    /**
+     * Changes the icon to show a sun (daytime) or moon (nighttime) based on the selected time.
+     */
     private updateIcon(): void {
         const isDay = this.currentTime >= 6 && this.currentTime < 18;
         
@@ -173,16 +220,27 @@ export class TimePicker {
         }
     }
 
+    /**
+     * Calls the registered callback when time changes.
+     */
     private notifyTimeChange(): void {
         if (this.onTimeChangeCallback) {
             this.onTimeChangeCallback(this.currentTime);
         }
     }
 
+    /**
+     * Registers a function to be called when the time is changed.
+     * @param callback Function that receives the new time (0-24 hours)
+     */
     public onTimeChange(callback: (time: number) => void): void {
         this.onTimeChangeCallback = callback;
     }
 
+    /**
+     * Sets the time picker to a specific time.
+     * @param time Time in hours (0-24)
+     */
     public setTime(time: number): void {
         this.currentTime = Math.max(0, Math.min(24, time));
         this.updateSlider();
@@ -190,6 +248,10 @@ export class TimePicker {
         this.updateIcon();
     }
 
+    /**
+     * Gets the currently selected time.
+     * @return Time in hours (0-24)
+     */
     public getTime(): number {
         return this.currentTime;
     }

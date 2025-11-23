@@ -6,9 +6,16 @@ import { CloudControl } from './cloud-control';
 import { LanternControl } from './lantern-control';
 import { getReferenceDistance } from '../util';
 
+/**
+ * Provides a button to copy the current camera position and scene settings to clipboard.
+ * Useful for saving specific views and settings to use in tour definitions.
+ */
 export class CopySettingsControl {
     private button: HTMLButtonElement;
 
+    /**
+     * Creates a copy settings control and finds the button in the DOM.
+     */
     constructor() {
         this.button = document.getElementById('copy-settings') as HTMLButtonElement;
         if (!this.button) {
@@ -18,12 +25,24 @@ export class CopySettingsControl {
         this.setupEventListeners();
     }
 
+    /**
+     * Sets up the click handler for the copy button.
+     */
     private setupEventListeners(): void {
         this.button.addEventListener('click', () => {
             this.copyCurrentSettings();
         });
     }
 
+    /**
+     * Connects this control to the scene and UI components it needs to read settings from.
+     * @param camera The camera to get position and rotation from
+     * @param customScene The scene manager
+     * @param timePicker The time picker to get current time from
+     * @param fogSlider The fog slider to get fog density from
+     * @param cloudControl The cloud control to get cloud settings from
+     * @param lanternControl The lantern control to get lantern settings from
+     */
     public setHandlers(
         camera: THREE.PerspectiveCamera,
         customScene: Scene,
@@ -40,6 +59,7 @@ export class CopySettingsControl {
         this.lanternControl = lanternControl;
     }
 
+    /** Camera reference for reading position */
     private camera?: THREE.PerspectiveCamera;
     private customScene?: Scene;
     private timePicker?: TimePicker;
@@ -47,6 +67,10 @@ export class CopySettingsControl {
     private cloudControl?: CloudControl;
     private lanternControl?: LanternControl;
 
+    /**
+     * Gathers all current camera and scene settings and copies them to clipboard as formatted code.
+     * The output is ready to paste into tour definition files.
+     */
     private copyCurrentSettings(): void {
         if (!this.camera || !this.customScene || !this.timePicker || 
             !this.fogSlider || !this.cloudControl || !this.lanternControl) {

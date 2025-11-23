@@ -1,3 +1,7 @@
+/**
+ * Manages a horizontal slideshow for presenting information.
+ * Allows navigation between slides using keyboard arrows or buttons, with smooth animations.
+ */
 export class Slideshow {
     private slideshow: HTMLElement;
     private slides: NodeListOf<HTMLElement>;
@@ -5,6 +9,10 @@ export class Slideshow {
     private totalSlides: number;
     private resizeTimeout: number | null = null;
 
+    /**
+     * Creates a new slideshow and finds all slide elements in the page.
+     * In development mode, starts on the last slide for easier testing.
+     */
     constructor() {
         this.slideshow = document.querySelector('.slideshow') as HTMLElement;
         this.slides = document.querySelectorAll('.slide');
@@ -24,6 +32,9 @@ export class Slideshow {
         this.init();
     }
 
+    /**
+     * Initializes the slideshow by setting up styles, event listeners, and positioning.
+     */
     private init(): void {
         this.slideshow.style.display = 'flex';
         this.slideshow.style.flexDirection = 'row';
@@ -40,6 +51,10 @@ export class Slideshow {
         this.updateSlidePosition();
     }
 
+    /**
+     * Handles keyboard arrow presses for slide navigation.
+     * @param event The keyboard event containing the pressed key
+     */
     private handleKeyDown(event: KeyboardEvent): void {
         switch (event.key) {
             case 'ArrowLeft':
@@ -53,6 +68,9 @@ export class Slideshow {
         }
     }
 
+    /**
+     * Calculates and applies the correct width for the slideshow and each slide based on window size.
+     */
     private calculateAndSetDimensions(): void {
         const slideWidth = window.innerWidth || document.documentElement.clientWidth || 1024;
         const totalWidth = this.totalSlides * slideWidth;
@@ -65,6 +83,9 @@ export class Slideshow {
         });
     }
 
+    /**
+     * Handles window resize events by recalculating slide dimensions after a short delay.
+     */
     private handleResize(): void {
         if (this.resizeTimeout) {
             clearTimeout(this.resizeTimeout);
@@ -76,6 +97,9 @@ export class Slideshow {
         }, 150);
     }
 
+    /**
+     * Moves to the next slide if one is available.
+     */
     public nextSlide(): void {
         if (this.currentSlide < this.totalSlides - 1) {
             this.currentSlide++;
@@ -83,6 +107,9 @@ export class Slideshow {
         }
     }
 
+    /**
+     * Moves to the previous slide if one is available.
+     */
     public previousSlide(): void {
         if (this.currentSlide > 0) {
             this.currentSlide--;
@@ -90,6 +117,9 @@ export class Slideshow {
         }
     }
 
+    /**
+     * Updates the slideshow's position to show the current slide with smooth animation.
+     */
     private updateSlidePosition(): void {
         const slideWidth = window.innerWidth || document.documentElement.clientWidth || 1024;
         const translateX = -this.currentSlide * slideWidth;
@@ -97,7 +127,10 @@ export class Slideshow {
         this.slideshow.setAttribute('data-slide', this.currentSlide.toString());
     }
 
-    // Public methods for external control if needed
+    /**
+     * Jumps directly to a specific slide by index.
+     * @param slideIndex The index of the slide to display (0-based)
+     */
     public goToSlide(slideIndex: number): void {
         if (slideIndex >= 0 && slideIndex < this.totalSlides) {
             this.currentSlide = slideIndex;
@@ -105,10 +138,18 @@ export class Slideshow {
         }
     }
 
+    /**
+     * Gets the index of the currently displayed slide.
+     * @return The current slide index (0-based)
+     */
     public getCurrentSlide(): number {
         return this.currentSlide;
     }
 
+    /**
+     * Gets the total number of slides in the slideshow.
+     * @return The total slide count
+     */
     public getTotalSlides(): number {
         return this.totalSlides;
     }

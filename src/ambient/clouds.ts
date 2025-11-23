@@ -1,6 +1,9 @@
 import * as THREE from 'three';
 import { getReferenceDistance } from '../util';
 
+/**
+ * Configuration options for generating 3D noise textures used in cloud rendering.
+ */
 type TextureBakeOptions = {
     size: number;
     coverage: number;
@@ -14,7 +17,11 @@ type TextureBakeOptions = {
 };
 
 /**
- * This clouds shader was adapted from the following Code: https://github.com/leoawen/volumetric-clouds
+ * Creates realistic volumetric clouds using 3D textures and ray-marching shaders.
+ * The clouds move across the sky, change density, and respond to sun lighting for day/night cycles.
+ * This implementation uses advanced rendering techniques to create fluffy, atmospheric clouds.
+ * 
+ * Shader adapted from: https://github.com/leoawen/volumetric-clouds
  */
 export class Clouds {
     private scene: THREE.Scene;
@@ -45,6 +52,11 @@ export class Clouds {
     private detailTexture!: THREE.Data3DTexture;
     private blueNoiseTexture!: THREE.DataTexture;
 
+    /**
+     * Creates a new volumetric cloud system.
+     * @param scene The Three.js scene to add clouds to
+     * @param camera The camera used for rendering clouds (needed for proper ray-marching)
+     */
     constructor(scene: THREE.Scene, camera: THREE.PerspectiveCamera) {
         this.scene = scene;
         this.camera = camera;
@@ -53,6 +65,10 @@ export class Clouds {
         this.createClouds();
     }
 
+    /**
+     * Pre-generates all 3D noise textures needed for cloud rendering.
+     * Creates volume, mask, detail, and blue noise textures with different characteristics.
+     */
     private bakeTextures() {
         this.volumeTexture = this.generate3DTexture({
             size: 96,
@@ -93,6 +109,11 @@ export class Clouds {
         this.blueNoiseTexture = this.generateBlueNoiseTexture(64);
     }
 
+    /**
+     * Sets up the cloud rendering system with custom shaders.
+     * Creates a large cube that uses ray-marching to render volumetric clouds inside it.
+     * The shaders sample 3D textures to create realistic cloud shapes and lighting.
+     */
     private createClouds() {
         const vertexShader = /* glsl */`
             in vec3 position;
@@ -287,6 +308,10 @@ export class Clouds {
         this.scene.add(this.mesh);
     }
 
+    /**
+     * Updates cloud animation every frame by moving the texture offset.
+     * This creates the appearance of clouds drifting across the sky with wind.
+     */
     public animate() {
         if (!this.material) return;
 
@@ -305,14 +330,26 @@ export class Clouds {
         this.textureOffset.z = this.textureOffset.z % 1000.0;
     }
 
+    /**
+     * Changes how fast clouds drift across the sky.
+     * @param speed Movement speed (0 = stationary, higher = faster)
+     */
     public setMovementSpeed(speed: number) {
         this.movementSpeed = THREE.MathUtils.clamp(speed, 0, 5);
     }
 
+    /**
+     * Gets the current cloud movement speed.
+     * @return The movement speed value
+     */
     public getMovementSpeed(): number {
         return this.movementSpeed;
     }
 
+    /**
+     * Adjusts how much of the sky is covered by clouds.
+     * @param amount Cloud coverage (0 = clear sky, 1 = fully overcast)
+     */
     public setCloudAmount(amount: number) {
         this.cloudAmount = THREE.MathUtils.clamp(amount, 0, 1);
         if (this.uniforms?.uCloudCoverage) {
@@ -320,14 +357,28 @@ export class Clouds {
         }
     }
 
+    /**
+     * Gets the current cloud coverage amount.
+     * @return The cloud amount value (0-1)
+     */
     public getCloudAmount(): number {
         return this.cloudAmount;
     }
 
+    /**
+     * Gets the Three.js mesh used for cloud rendering.
+     * @return The cloud mesh object
+     */
     public getMesh() {
         return this.mesh;
     }
 
+    /**
+     * Updates cloud lighting based on the sun's position in the sky.
+     * Changes cloud colors and brightness to match time of day - brighter during day, darker at night.
+     * @param elevation The sun's elevation angle in degrees
+     * @param sunDirection Optional 3D vector pointing toward the sun for directional lighting
+     */
     public updateLightingForSun(elevation: number, sunDirection?: THREE.Vector3) {
         if (!this.uniforms || !isFinite(elevation)) return;
 
@@ -360,6 +411,11 @@ export class Clouds {
         }
     }
 
+    /**
+     * Generates a random noise texture used to break up banding in cloud rendering.
+     * @param size The width and height of the texture in pixels
+     * @return A 2D noise texture
+     */
     private generateBlueNoiseTexture(size: number) {
         const data = new Uint8Array(size * size);
         for (let i = 0; i < data.length; i++) {
@@ -371,6 +427,12 @@ export class Clouds {
         return texture;
     }
 
+    /**
+     * Creates a 3D noise texture using fractal Brownian motion.
+     * These textures define the shape and detail of the clouds.
+     * @param options Configuration for texture generation including size, noise scale, and other parameters
+     * @return A 3D texture containing volumetric noise data
+     */
     private generate3DTexture(options: TextureBakeOptions) {
         const {
             size,
@@ -416,6 +478,11 @@ export class Clouds {
     }
 }
 
+/**
+ * Creates a seeded random number generator for reproducible noise.
+ * @param seed The seed value that determines the random sequence
+ * @return A random function that generates consistent values based on the seed
+ */
 function createSeededRandom(seed: number) {
     return function () {
         let t = seed += 0x6D2B79F5;
@@ -425,9 +492,17 @@ function createSeededRandom(seed: number) {
     };
 }
 
+/**
+ * Generates smooth Perlin noise for creating natural-looking patterns.
+ * This is used to generate the base shapes of clouds.
+ */
 class ImprovedNoise {
     private p: Uint8Array;
 
+    /**
+     * Creates a new Perlin noise generator with a custom random function.
+     * @param random Optional random function to use (defaults to Math.random)
+     */
     constructor(random = Math.random) {
         const p = new Uint8Array(256);
         for (let i = 0; i < 256; i++) p[i] = i;
@@ -439,6 +514,13 @@ class ImprovedNoise {
         for (let i = 0; i < 512; i++) this.p[i] = p[i & 255];
     }
 
+    /**
+     * Generates a smooth noise value at a 3D point.
+     * @param x X coordinate in noise space
+     * @param y Y coordinate in noise space
+     * @param z Z coordinate in noise space
+     * @return A noise value between -1 and 1
+     */
     noise(x: number, y: number, z: number) {
         const p = this.p;
         const X = Math.floor(x) & 255;
@@ -471,14 +553,34 @@ class ImprovedNoise {
     }
 }
 
+/**
+ * Smoothing function used in Perlin noise interpolation.
+ * @param t Input value
+ * @return Smoothed output value
+ */
 function fade(t: number) {
     return t * t * t * (t * (t * 6 - 15) + 10);
 }
 
+/**
+ * Linear interpolation between two values.
+ * @param t Blend factor (0 = all a, 1 = all b)
+ * @param a Start value
+ * @param b End value
+ * @return Interpolated value
+ */
 function lerp(t: number, a: number, b: number) {
     return a + t * (b - a);
 }
 
+/**
+ * Gradient function used in Perlin noise calculation.
+ * @param hash Random hash value
+ * @param x X coordinate offset
+ * @param y Y coordinate offset
+ * @param z Z coordinate offset
+ * @return Gradient value
+ */
 function grad(hash: number, x: number, y: number, z: number) {
     const h = hash & 15;
     const u = h < 8 ? x : y;
@@ -486,6 +588,18 @@ function grad(hash: number, x: number, y: number, z: number) {
     return ((h & 1) === 0 ? u : -u) + ((h & 2) === 0 ? v : -v);
 }
 
+/**
+ * Fractal Brownian Motion - combines multiple octaves of noise for detailed cloud shapes.
+ * Creates natural-looking patterns by layering noise at different scales.
+ * @param noise The noise generator to use
+ * @param x X coordinate
+ * @param y Y coordinate
+ * @param z Z coordinate
+ * @param octaves Number of noise layers to combine
+ * @param persistence How much each octave contributes (amplitude multiplier)
+ * @param lacunarity How much detail each octave adds (frequency multiplier)
+ * @return Combined noise value
+ */
 function fbm(
     noise: ImprovedNoise,
     x: number,

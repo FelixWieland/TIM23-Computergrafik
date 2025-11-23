@@ -18,6 +18,11 @@ import { Clocks } from './nodes/clocks';
 import { CollisionDetector } from './controls/collision-detector';
 import { TourAnimator } from './tours/tour-animator';
 
+/**
+ * Manages the main 3D scene and all its components.
+ * This class sets up the camera, lighting, ambient effects, and all 3D objects in the world.
+ * It also handles the animation loop for updating all scene elements.
+ */
 export class Scene {
     private scene: THREE.Scene;
     private camera: THREE.PerspectiveCamera;
@@ -45,6 +50,12 @@ export class Scene {
     private lanterns!: Lanterns
     private clocks!: Clocks
 
+    /**
+     * Creates a new scene manager with all necessary components.
+     * @param scene The Three.js scene object that holds all 3D objects
+     * @param camera The perspective camera used to view the scene
+     * @param renderer The WebGL renderer that draws everything to the screen
+     */
     constructor(scene: THREE.Scene, camera: THREE.PerspectiveCamera, renderer: THREE.WebGLRenderer) {
         this.scene = scene;
         this.camera = camera;
@@ -52,6 +63,10 @@ export class Scene {
         this.setup()
     }
 
+    /**
+     * Initializes all scene components including lighting, camera, controls, ambient effects, and 3D models.
+     * This sets up the sun, sky, fog, clouds, water, terrain, buildings, and other objects.
+     */
     public setup() {
         // Setup camera, debug lighting, pointer lock controls, keyboard controls
         this.setupDebugLighting()
@@ -76,6 +91,10 @@ export class Scene {
         this.clocks = new Clocks(this.scene)
     }
 
+    /**
+     * Adds debug lighting to the scene for development purposes.
+     * Creates ambient and directional lights to make objects visible during debugging.
+     */
     private setupDebugLighting() {
         // return;
         
@@ -91,6 +110,10 @@ export class Scene {
         this.scene.add(debugAmbientLight);
     }
 
+    /**
+     * Positions the camera at its starting location and configures its rotation order.
+     * Sets the camera above and slightly behind the origin point.
+     */
     private setupCamera() {
         const distance = getReferenceDistance();
         this.camera.position.set(0, distance * 0.1, distance * 0.2);
@@ -98,6 +121,10 @@ export class Scene {
         this.camera.rotation.order = 'YXZ';
     }
 
+    /**
+     * Sets up first-person camera controls using pointer lock.
+     * Enables mouse-look camera movement and keyboard-based player movement with collision detection.
+     */
     private setupPointerLockControls() {
         this.controls = new PointerLockControls(this.camera, document.body);
         this.scene.add(this.controls.object);
@@ -118,38 +145,75 @@ export class Scene {
         this.keyboardControls.setCollisionDetector(this.collisionDetector);
     }
 
+    /**
+     * Gets the sun controller that manages sunlight and time of day.
+     * @return The sun instance
+     */
     public getSun(): Sun {
         return this.sun;
     }
 
+    /**
+     * Gets the fog controller that manages scene fog density and color.
+     * @return The fog instance
+     */
     public getFog(): Fog {
         return this.fog;
     }
 
+    /**
+     * Gets the clouds controller that manages volumetric cloud rendering.
+     * @return The clouds instance
+     */
     public getClouds(): Clouds {
         return this.clouds;
     }
 
+    /**
+     * Gets the lanterns controller that manages all lantern lights in the scene.
+     * @return The lanterns instance
+     */
     public getLanterns(): Lanterns {
         return this.lanterns;
     }
 
+    /**
+     * Gets the clocks controller that manages all animated clocks in the scene.
+     * @return The clocks instance
+     */
     public getClocks(): Clocks {
         return this.clocks;
     }
 
+    /**
+     * Gets the perspective camera used to view the scene.
+     * @return The Three.js camera instance
+     */
     public getCamera(): THREE.PerspectiveCamera {
         return this.camera;
     }
 
+    /**
+     * Gets the pointer lock controls used for first-person camera movement.
+     * @return The pointer lock controls instance
+     */
     public getControls(): PointerLockControls {
         return this.controls;
     }
 
+    /**
+     * Sets the tour animator that handles automated camera tours.
+     * @param tourAnimator The tour animator instance to use for guided tours
+     */
     public setTourAnimator(tourAnimator: TourAnimator): void {
         this.tourAnimator = tourAnimator;
     }
 
+    /**
+     * Updates all animated elements in the scene for the current frame.
+     * This includes the sun position, clouds, water, clocks, and all 3D objects.
+     * Called every frame to keep the scene moving and responsive.
+     */
     public animate() {
         this.keyboardControls.update();
         let solarInfo: { azimuth: number, elevation: number, isDay: boolean } | null = null;

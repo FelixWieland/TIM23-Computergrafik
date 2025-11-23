@@ -1,12 +1,19 @@
 import type { Scene } from "three";
 import * as THREE from "three";
 
+/**
+ * Represents a single water layer with its visual properties.
+ */
 interface WaterLayer {
     mesh: THREE.Mesh;
     normals: THREE.Texture;
     animationOffset: number;
 }
 
+/**
+ * Creates and manages animated water surfaces with flowing effects.
+ * Uses multiple layers of water at different depths with animated normal maps for realistic water movement.
+ */
 export class Water {
     scene: Scene;
     water: THREE.Mesh | null = null;
@@ -19,6 +26,13 @@ export class Water {
     private time: number = 0;
     private readonly waterSize = 950;
 
+    /**
+     * Creates a new water system with multiple layers and a riverbed.
+     * @param scene The Three.js scene to add water to
+     * @param renderer The WebGL renderer used for rendering
+     * @param camera The camera used to view the water
+     * @param sun Optional directional light that illuminates the water
+     */
     public constructor(
         scene: Scene,
         renderer: THREE.WebGLRenderer,
@@ -34,12 +48,23 @@ export class Water {
         this.setup();
     }
 
+    /**
+     * Creates the water layers and riverbed at different depths.
+     * Sets up two water layers with different animation offsets for varied movement.
+     */
     public setup() {
         this.water = this.setupWater(-3, 0.7, 0);
         this.water2 = this.setupWater(-10, 0.7, Math.PI / 2);
         this.setupRiverbed(-20);
     }
 
+    /**
+     * Creates a single water layer with animated normal maps for ripple effects.
+     * @param y The vertical position of the water layer
+     * @param transparency How see-through the water is (0 = opaque, 1 = transparent)
+     * @param animationOffset Phase offset for animation to create varied movement
+     * @return The water mesh that was created
+     */
     private setupWater(y: number, transparency: number, animationOffset: number): THREE.Mesh {
         const textureLoader = new THREE.TextureLoader();
         const waterGeometry = new THREE.PlaneGeometry(this.waterSize, this.waterSize);
@@ -74,6 +99,11 @@ export class Water {
         return water;
     }
 
+    /**
+     * Creates the riverbed floor beneath the water layers.
+     * @param y The vertical position of the riverbed
+     * @return The riverbed mesh that was created
+     */
     private setupRiverbed(y: number): THREE.Mesh {
         const textureLoader = new THREE.TextureLoader();
         const riverbedGeometry = new THREE.PlaneGeometry(this.waterSize, this.waterSize);
@@ -100,6 +130,10 @@ export class Water {
         return riverbed;
     }
 
+    /**
+     * Updates water animation every frame by moving the normal map textures.
+     * Creates flowing water effects by shifting ripple patterns over time.
+     */
     public animate() {
         if (this.waterLayers.length === 0) return;
         this.time += 0.05;

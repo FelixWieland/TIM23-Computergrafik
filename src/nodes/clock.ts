@@ -2,6 +2,10 @@ import { Group, Vector3, type Scene } from "three";
 import type { GLTF } from "three/examples/jsm/Addons.js";
 import { Gltf } from "./gltf";
 
+/**
+ * Creates an animated clock with working hour and minute hands.
+ * The clock hands move smoothly to show the current time, including smooth second-by-second movement.
+ */
 export class Clock {
     scene: Scene;
     position: Vector3;
@@ -16,6 +20,13 @@ export class Clock {
     minuteHandMesh: Group | null = null;
     hourHandMesh: Group | null = null;
 
+    /**
+     * Creates a new clock at a specific position with custom orientation and size.
+     * @param scene The Three.js scene to add the clock to
+     * @param position Where to place the clock in 3D space
+     * @param rotationY How many degrees to rotate the clock face around the Y axis
+     * @param scale How large to make the clock (1 = normal size)
+     */
     public constructor(scene: Scene, position: Vector3, rotationY: number = 180, scale: number = 1) {
         this.clockGltf = new Gltf("/models/UhrBasis.optim.glb");
         this.minutehandGltf = new Gltf("/models/Minutenzeiger.optim.glb");
@@ -35,6 +46,13 @@ export class Clock {
         gltfs.then(this.setup.bind(this))
     }
 
+    /**
+     * Assembles the clock from its loaded 3D model parts.
+     * Combines the clock face with hour and minute hands into one group.
+     * @param clockGltf The clock face model
+     * @param minutehandGltf The minute hand model  
+     * @param hourhandGltf The hour hand model
+     */
     public setup([clockGltf, minutehandGltf, hourhandGltf]: [GLTF, GLTF, GLTF]) {
         this.clockGroup = new Group();
         this.clockGroup.add(clockGltf.scene);
@@ -51,10 +69,19 @@ export class Clock {
         this.scene.add(this.clockGroup);
     }
 
+    /**
+     * Sets what time the clock should display.
+     * @param date The date and time to show on the clock
+     */
     public setCustomDateTime(date: Date) {
         this.customDate = date;
     }
 
+    /**
+     * Updates the clock hands to show the current time with smooth animation.
+     * The hands move continuously (not in discrete steps) for realistic clock movement.
+     * Includes precise calculations that account for hours, minutes, and seconds.
+     */
     public animate() {
         if (this.clockGroup === null || this.minuteHandMesh === null || this.hourHandMesh === null) return;
  

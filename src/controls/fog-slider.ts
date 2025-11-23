@@ -1,3 +1,7 @@
+/**
+ * A UI control for adjusting fog density with a draggable slider.
+ * Allows users to control how thick the atmospheric fog appears.
+ */
 export class FogSlider {
     private sliderContainer: HTMLElement;
     private sliderTrack: HTMLElement;
@@ -9,6 +13,9 @@ export class FogSlider {
     private currentDensity: number = 0.0; 
     private maxDensity: number = 0.01;
 
+    /**
+     * Creates a fog density slider and initializes it to zero fog.
+     */
     constructor() {
         this.sliderContainer = document.getElementById('fog-slider') as HTMLElement;
         this.sliderTrack = this.sliderContainer.querySelector('.time-slider-track') as HTMLElement;
@@ -21,6 +28,9 @@ export class FogSlider {
         this.updateDensityDisplay();
     }
 
+    /**
+     * Sets up mouse, touch, and keyboard event handlers for the slider.
+     */
     private setupEventListeners(): void {
         this.sliderTrack.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -74,6 +84,9 @@ export class FogSlider {
         });
     }
 
+    /**
+     * Makes the fog slider visible with smooth animation.
+     */
     public show(): void {
         this.sliderContainer.style.display = 'block';
         requestAnimationFrame(() => {
@@ -81,6 +94,9 @@ export class FogSlider {
         });
     }
 
+    /**
+     * Hides the fog slider with smooth animation.
+     */
     public close(): void {
         this.sliderContainer.classList.remove('show');
         setTimeout(() => {
@@ -88,10 +104,18 @@ export class FogSlider {
         }, 300);
     }
 
+    /**
+     * Checks if the fog slider is currently visible.
+     * @return True if visible, false if hidden
+     */
     public isOpen(): boolean {
         return this.sliderContainer.classList.contains('show');
     }
 
+    /**
+     * Begins dragging the slider handle.
+     * @param e Mouse or touch event
+     */
     private startDragging(e: MouseEvent | Touch): void {
         this.isDragging = true;
         this.sliderHandle.style.cursor = 'grabbing';
@@ -100,6 +124,10 @@ export class FogSlider {
         }
     }
 
+    /**
+     * Handles dragging the slider to change fog density.
+     * @param e Mouse or touch event with position
+     */
     private handleDrag(e: MouseEvent | Touch): void {
         if (!this.isDragging) return;
 
@@ -113,11 +141,18 @@ export class FogSlider {
         this.notifyDensityChange();
     }
 
+    /**
+     * Ends dragging the slider handle.
+     */
     private stopDragging(): void {
         this.isDragging = false;
         this.sliderHandle.style.cursor = 'grab';
     }
 
+    /**
+     * Handles clicking on the slider track to jump to a specific density.
+     * @param e Mouse event with click position
+     */
     private handleTrackClick(e: MouseEvent): void {
         const rect = this.sliderTrack.getBoundingClientRect();
         const x = e.clientX - rect.left;
@@ -129,32 +164,53 @@ export class FogSlider {
         this.notifyDensityChange();
     }
 
+    /**
+     * Updates the slider handle and fill to match current density.
+     */
     private updateSlider(): void {
         const percentage = (this.currentDensity / this.maxDensity) * 100;
         this.sliderHandle.style.left = `${percentage}%`;
         this.sliderFill.style.width = `${percentage}%`;
     }
 
+    /**
+     * Updates the text display showing current fog density value.
+     */
     private updateDensityDisplay(): void {
         this.densityDisplay.textContent = this.currentDensity.toFixed(4);
     }
 
+    /**
+     * Calls the registered callback when density changes.
+     */
     private notifyDensityChange(): void {
         if (this.onDensityChangeCallback) {
             this.onDensityChangeCallback(this.currentDensity);
         }
     }
 
+    /**
+     * Registers a function to be called when fog density changes.
+     * @param callback Function that receives the new density value
+     */
     public onDensityChange(callback: (density: number) => void): void {
         this.onDensityChangeCallback = callback;
     }
 
+    /**
+     * Sets the fog density to a specific value.
+     * @param density Fog density (0 = no fog, higher = thicker fog)
+     */
     public setDensity(density: number): void {
         this.currentDensity = Math.max(0, Math.min(this.maxDensity, density));
         this.updateSlider();
         this.updateDensityDisplay();
     }
 
+    /**
+     * Gets the current fog density value.
+     * @return Current fog density
+     */
     public getDensity(): number {
         return this.currentDensity;
     }

@@ -1,6 +1,11 @@
 import * as THREE from 'three';
 import { getReferenceDistance } from '../util';
 
+/**
+ * Manages the sun's position and lighting based on real-world solar calculations.
+ * Simulates accurate sun movement across the sky using geographic location and time.
+ * The sun automatically adjusts its color and intensity throughout the day for realistic lighting.
+ */
 export class Sun {
     private light!: THREE.DirectionalLight;
     private sunMesh!: THREE.Mesh;
@@ -13,6 +18,13 @@ export class Sun {
     private customDateTime: Date | null = null;
     private lastSolarInfo: { azimuth: number, elevation: number, isDay: boolean } | null = null;
 
+    /**
+     * Creates a new sun system with accurate solar positioning.
+     * @param scene The Three.js scene to add the sun to
+     * @param latitude Geographic latitude in degrees (defaults to 52.5 for Berlin)
+     * @param longitude Geographic longitude in degrees (defaults to 13.4 for Berlin)
+     * @param timezone Timezone offset from UTC in hours (defaults to 1 for CET)
+     */
     constructor(scene: THREE.Scene, latitude?: number, longitude?: number, timezone?: number) {
         this.scene = scene;
         if (latitude !== undefined) this.latitude = latitude;
@@ -21,6 +33,10 @@ export class Sun {
         this.createSun();
     }
 
+    /**
+     * Creates the sun light source and visual sun mesh.
+     * Sets up directional lighting with shadows and positions the sun in the sky.
+     */
     private createSun() {
         const distance = getReferenceDistance();
         this.orbitRadius = distance * 2;
@@ -53,6 +69,11 @@ export class Sun {
         
     }
 
+    /**
+     * Calculates the sun's position in the sky using astronomical formulas.
+     * Takes into account the date, time, location, and equation of time for accurate positioning.
+     * @return Object containing azimuth (compass direction) and elevation (height above horizon) in degrees
+     */
     private calculateSolarPosition(): { azimuth: number, elevation: number } {
         const now = this.customDateTime || new Date();
         const startOfYear = new Date(now.getFullYear(), 0, 1);
@@ -88,6 +109,12 @@ export class Sun {
         };
     }
 
+    /**
+     * Converts solar angles (azimuth and elevation) to a 3D position in the scene.
+     * @param azimuth The compass direction in degrees (0 = north, 90 = east, 180 = south, 270 = west)
+     * @param elevation The height above horizon in degrees (0 = horizon, 90 = directly overhead)
+     * @return The 3D position where the sun should be placed
+     */
     private solarAnglesToPosition(azimuth: number, elevation: number): THREE.Vector3 {
         const azimuthRad = azimuth * Math.PI / 180;
         const elevationRad = elevation * Math.PI / 180;
@@ -99,6 +126,11 @@ export class Sun {
         return new THREE.Vector3(x, y, z);
     }
 
+    /**
+     * Updates the sun's position and lighting for the current frame.
+     * Recalculates solar position, adjusts light intensity, and changes color for sunrise/sunset effects.
+     * Called every frame to keep the sun moving realistically across the sky.
+     */
     public update() {
         const solarPosition = this.calculateSolarPosition();
         const sunPosition = this.solarAnglesToPosition(solarPosition.azimuth, solarPosition.elevation);
@@ -148,16 +180,25 @@ export class Sun {
         }
     }
 
+    /**
+     * Gets the directional light that represents the sun's illumination.
+     * @return The Three.js directional light used for sun lighting
+     */
     public getLight(): THREE.DirectionalLight {
         return this.light;
     }
 
+    /**
+     * Gets the visual mesh that represents the sun in the sky.
+     * @return The Three.js mesh that shows where the sun is
+     */
     public getSunMesh(): THREE.Mesh {
         return this.sunMesh;
     }
 
     /**
-     * Get current solar position information
+     * Gets the current solar position information including whether it's daytime.
+     * @return Object with azimuth, elevation angles in degrees, and daytime flag
      */
     public getSolarInfo(): { azimuth: number, elevation: number, isDay: boolean } {
         if (this.lastSolarInfo) {
@@ -175,7 +216,10 @@ export class Sun {
     }
 
     /**
-     * Set location for solar calculations
+     * Changes the geographic location used for solar position calculations.
+     * @param latitude Geographic latitude in degrees (positive = north, negative = south)
+     * @param longitude Geographic longitude in degrees (positive = east, negative = west)
+     * @param timezone Timezone offset from UTC in hours
      */
     public setLocation(latitude: number, longitude: number, timezone: number): void {
         this.latitude = latitude;
@@ -186,7 +230,9 @@ export class Sun {
     }
 
     /**
-     * Set custom date and time for solar calculations
+     * Sets a custom date and time instead of using the current real time.
+     * Useful for showing how the sun moves at different times of day or year.
+     * @param dateTime The date and time to use for solar calculations
      */
     public setCustomDateTime(dateTime: Date): void {
         this.customDateTime = new Date(dateTime);
@@ -195,7 +241,7 @@ export class Sun {
     }
 
     /**
-     * Reset to current real time
+     * Stops using custom time and returns to using the current real time.
      */
     public resetToCurrentTime(): void {
         this.customDateTime = null;
@@ -204,7 +250,10 @@ export class Sun {
     }
 
     /**
-     * Force sun to a specific position for testing
+     * Manually positions the sun at specific angles, bypassing solar calculations.
+     * Useful for testing or creating specific lighting scenarios.
+     * @param azimuth The compass direction in degrees
+     * @param elevation The height above horizon in degrees
      */
     public setSunPosition(azimuth: number, elevation: number): void {
         const sunPosition = this.solarAnglesToPosition(azimuth, elevation);
@@ -236,7 +285,8 @@ export class Sun {
     }
 
     /**
-     * Set sun to perfect noon position (directly overhead)
+     * Positions the sun at high noon with maximum brightness.
+     * Places sun high in the southern sky for strong overhead lighting.
      */
     public setToNoon(): void {
         // For noon: azimuth 180° (south), elevation should be very high for maximum lighting
@@ -246,7 +296,7 @@ export class Sun {
     }
 
     /**
-     * Force maximum brightness for testing
+     * Sets the sun to maximum brightness for testing or demonstration purposes.
      */
     public setMaximumBrightness(): void {
         this.light.intensity = 3.0; // Maximum brightness
@@ -255,7 +305,8 @@ export class Sun {
     }
 
     /**
-     * Test method to get current solar information
+     * Prints detailed information about the current sun position to the console.
+     * Useful for debugging or understanding current solar conditions.
      */
     public logCurrentSolarInfo(): void {
         const solarInfo = this.getSolarInfo();

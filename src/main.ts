@@ -18,6 +18,11 @@ import { CopySettingsControl } from './controls/copy-settings-control';
 import { getReferenceDistance } from './util';
 import Stats from 'three/examples/jsm/libs/stats.module.js';
 
+/**
+ * Sets up and starts the 3D visualization application.
+ * Initializes the scene, camera, renderer, controls, and all interactive elements.
+ * This includes slideshow navigation, time controls, fog, clouds, lanterns, and tours.
+ */
 function main() {
     const slideshow = new Slideshow();
 
@@ -141,6 +146,10 @@ function main() {
     (window as any).timePicker = timePicker;
     (window as any).fullscreenControl = fullscreenControl;
     
+    /**
+     * Main animation loop that updates and renders the scene every frame.
+     * Updates performance stats, scene animations, camera position display, and renders the final frame.
+     */
     function animate() {
         stats.begin();
         requestAnimationFrame(animate);

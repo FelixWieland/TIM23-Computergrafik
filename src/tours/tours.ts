@@ -1,6 +1,10 @@
 import * as THREE from 'three';
 import { Tour } from './tour';
 
+/**
+ * Collection of predefined tours that users can select.
+ * Each tour shows interesting views and demonstrates different times of day or weather conditions.
+ */
 export const tours: Tour[] = [
     new Tour(
         "Demo Tour",

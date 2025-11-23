@@ -2,6 +2,10 @@ import * as THREE from 'three';
 import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls.js';
 import { CollisionDetector } from './collision-detector';
 
+/**
+ * Handles keyboard input for moving the camera around the scene.
+ * Provides WASD/arrow keys for movement, space/shift for up/down, and includes collision detection.
+ */
 export class KeyboardControls {
     private moveForward = false;
     private moveBackward = false;
@@ -22,6 +26,10 @@ export class KeyboardControls {
     private onKeyUpHandler: (event: KeyboardEvent) => void;
     private collisionDetector: CollisionDetector | null = null;
 
+    /**
+     * Creates keyboard controls for camera movement.
+     * @param controls The pointer lock controls that manage the camera
+     */
     constructor(controls: PointerLockControls) {
         this.controls = controls;
         this.onKeyDownHandler = this.handleKeyDown.bind(this);
@@ -31,6 +39,10 @@ export class KeyboardControls {
         document.addEventListener('keyup', this.onKeyUpHandler);
     }
 
+    /**
+     * Handles key press events to start movement in various directions.
+     * @param event The keyboard event with the pressed key
+     */
     private handleKeyDown(event: KeyboardEvent): void {
         switch (event.code) {
             case 'ArrowUp':
@@ -67,6 +79,10 @@ export class KeyboardControls {
         }
     }
 
+    /**
+     * Handles key release events to stop movement.
+     * @param event The keyboard event with the released key
+     */
     private handleKeyUp(event: KeyboardEvent): void {
         switch (event.code) {
             case 'ArrowUp':
@@ -97,6 +113,9 @@ export class KeyboardControls {
         }
     }
 
+    /**
+     * Shows or hides the UI elements when the I key is pressed.
+     */
     private toggleUI(): void {
         const statsPanel = document.getElementById('stats-panel');
         const controls = document.getElementsByClassName('controls');
@@ -107,6 +126,11 @@ export class KeyboardControls {
         }
     }
 
+    /**
+     * Updates camera position each frame based on keyboard input.
+     * Applies physics-like movement with deceleration and handles collisions if a detector is set.
+     * Movement is relative to camera direction for natural first-person controls.
+     */
     public update(): void {
         const time = performance.now();
 
@@ -198,10 +222,17 @@ export class KeyboardControls {
         this.prevTime = time;
     }
 
+    /**
+     * Connects a collision detector to prevent walking through walls.
+     * @param detector The collision detector to use, or null to disable collision detection
+     */
     public setCollisionDetector(detector: CollisionDetector | null): void {
         this.collisionDetector = detector;
     }
 
+    /**
+     * Cleans up event listeners when keyboard controls are no longer needed.
+     */
     public dispose(): void {
         document.removeEventListener('keydown', this.onKeyDownHandler);
         document.removeEventListener('keyup', this.onKeyUpHandler);
