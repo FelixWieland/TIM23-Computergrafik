@@ -3,7 +3,6 @@ import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockCont
 import { Sun } from './ambient/sun';
 import { Fog } from './ambient/fog';
 import { Clouds } from './ambient/clouds';
-import { getReferenceDistance } from './util';
 import { Sky } from './ambient/sky';
 import { Churches } from './nodes/churches';
 import { CityWall } from './nodes/cityWall';
@@ -115,10 +114,6 @@ export class Scene {
      * Sets the camera above and slightly behind the origin point.
      */
     private setupCamera() {
-        const distance = getReferenceDistance();
-        this.camera.position.set(0, distance * 0.1, distance * 0.2);
-        // -7.12, 262.61, -398.17 | -46.8°, -179.0°
-
         this.camera.rotation.order = 'YXZ';
         this.camera.position.set(-7.12, 262.61, -398.17);
         this.camera.rotation.set(-0.7788, -3.1388, 0);
