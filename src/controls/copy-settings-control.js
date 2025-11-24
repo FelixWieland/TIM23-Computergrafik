@@ -105,7 +105,7 @@ export class CopySettingsControl {
         parameterLines.push(`                colorIntensity: ${this.lanternControl.getIntensity().toFixed(4)},`);
         parameterLines.push(`                fogValue: ${this.fogSlider.getDensity().toFixed(6)},`);
         parameterLines.push(`                dateTime: new Date(${dateTime.getFullYear()}, ${dateTime.getMonth()}, ${dateTime.getDate()}, ${dateTime.getHours()}, ${dateTime.getMinutes()}), // ${dateTime.getHours().toString().padStart(2, '0')}:${dateTime.getMinutes().toString().padStart(2, '0')}`);
-        parameterLines.push(`                duration: 3.0`);
+        parameterLines.push(`                duration: 3000`);
         const code = `            {\n${parameterLines.join('\n')}\n            },`;
         navigator.clipboard.writeText(code).catch((err) => {
             console.error('Failed to copy settings:', err);

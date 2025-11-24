@@ -8,6 +8,7 @@ import * as THREE from 'three';
 export class TourAnimator {
     isAnimatingTour = false;
     wasPointerLocked = false;
+    enableEasing = true;
     startTime = 0;
     duration = 0;
     parameter = null;
@@ -113,11 +114,15 @@ export class TourAnimator {
             this.startFogValue = fogSlider.getDensity();
             this.startWarmth = lanternControl.getWarmth();
             this.startIntensity = lanternControl.getIntensity();
-            const currentTime = timePicker.getTime();
-            const currentHours = Math.floor(currentTime);
-            const currentMinutes = Math.floor((currentTime - currentHours) * 60);
-            const now = new Date();
-            this.startDateTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), currentHours, currentMinutes);
+            if (this.targetDateTime && this.targetDateTime.getTime() !== 0) {
+                this.startDateTime = new Date(this.targetDateTime);
+            } else {
+                const currentTime = timePicker.getTime();
+                const currentHours = Math.floor(currentTime);
+                const currentMinutes = Math.floor((currentTime - currentHours) * 60);
+                const now = new Date();
+                this.startDateTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), currentHours, currentMinutes);
+            }
             this.targetPosition = parameter.position || this.startPosition.clone();
             this.targetRotation = parameter.cameraRotation || this.startRotation;
             this.targetCloudSpeed = parameter.cloudMovementSpeed !== undefined ? parameter.cloudMovementSpeed : this.startCloudSpeed;
@@ -141,9 +146,11 @@ export class TourAnimator {
         const currentTime = performance.now();
         const elapsed = currentTime - this.startTime;
         const progress = Math.min(elapsed / this.duration, 1);
-        const easedProgress = progress < 0.5
-            ? 2 * progress * progress
-            : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+        const easedProgress = this.enableEasing
+            ? (progress < 0.5
+                ? 2 * progress * progress
+                : 1 - Math.pow(-2 * progress + 2, 2) / 2)
+            : progress;
         if (this.parameter.position) {
             const currentPos = this.lerpVector3(this.startPosition, this.targetPosition, easedProgress);
             this.camera.position.copy(currentPos);
