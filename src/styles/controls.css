@@ -1,4 +1,3 @@
-
 .controls {
     position: fixed;
     bottom: 20px;
@@ -76,6 +75,7 @@
         opacity: 0;
         transform: translateX(100%);
     }
+
     to {
         opacity: 1;
         transform: translateX(0);
@@ -197,7 +197,9 @@
 
 
 /* Slider posititioning */
-#fog-slider, #time-picker-slider, #cloud-control-slider {
+#fog-slider,
+#time-picker-slider,
+#cloud-control-slider {
     bottom: 80px !important;
 }
 
@@ -216,11 +218,13 @@
     background: linear-gradient(90deg, rgba(121, 138, 160, 0.3) 0%, rgba(121, 138, 160, 0.6) 50%, rgba(121, 138, 160, 0.9) 100%);
 }
 
-#cloud-icon, #cloud-icon-amount {
+#cloud-icon,
+#cloud-icon-amount {
     color: #798aa0;
 }
 
-#cloud-icon svg, #cloud-icon-amount svg {
+#cloud-icon svg,
+#cloud-icon-amount svg {
     filter: drop-shadow(0 0 4px rgba(121, 138, 160, 0.5));
 }
 
