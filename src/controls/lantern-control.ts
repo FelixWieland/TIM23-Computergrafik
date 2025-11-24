@@ -9,14 +9,17 @@ export class LanternControl {
     private warmthDisplay: HTMLElement;
     private intensityDisplay: HTMLElement;
     private enableCheckbox: HTMLInputElement;
+    private debugLightingCheckbox: HTMLInputElement;
     private onWarmthChangeCallback?: (warmth: number) => void;
     private onIntensityChangeCallback?: (intensity: number) => void;
     private onEnableChangeCallback?: (enabled: boolean) => void;
+    private onDebugLightingChangeCallback?: (enabled: boolean) => void;
     private isDraggingWarmth: boolean = false;
     private isDraggingIntensity: boolean = false;
-    private currentWarmth: number = 0.5;
-    private currentIntensity: number = 10.0;
+    private currentWarmth: number = 0.6;
+    private currentIntensity: number = 30.0;
     private isEnabled: boolean = true;
+    private isDebugLightingEnabled: boolean = false;
     private maxWarmth: number = 1.0;
     private maxIntensity: number = 50.0;
 
@@ -31,11 +34,13 @@ export class LanternControl {
         this.warmthDisplay = document.getElementById('lantern-warmth-display') as HTMLElement;
         this.intensityDisplay = document.getElementById('lantern-intensity-display') as HTMLElement;
         this.enableCheckbox = document.getElementById('lantern-enable-checkbox') as HTMLInputElement;
+        this.debugLightingCheckbox = document.getElementById('lantern-debug-lighting-checkbox') as HTMLInputElement;
 
         this.setupEventListeners();
         this.updateSliders();
         this.updateDisplays();
         this.updateCheckbox();
+        this.updateDebugLightingCheckbox();
     }
 
     private setupEventListeners(): void {
@@ -108,6 +113,11 @@ export class LanternControl {
         this.enableCheckbox.addEventListener('change', (e) => {
             this.isEnabled = (e.target as HTMLInputElement).checked;
             this.notifyEnableChange();
+        });
+
+        this.debugLightingCheckbox.addEventListener('change', (e) => {
+            this.isDebugLightingEnabled = (e.target as HTMLInputElement).checked;
+            this.notifyDebugLightingChange();
         });
 
         document.addEventListener('click', (e) => {
@@ -250,6 +260,10 @@ export class LanternControl {
         this.enableCheckbox.checked = this.isEnabled;
     }
 
+    private updateDebugLightingCheckbox(): void {
+        this.debugLightingCheckbox.checked = this.isDebugLightingEnabled;
+    }
+
     private notifyWarmthChange(): void {
         if (this.onWarmthChangeCallback) {
             this.onWarmthChangeCallback(this.currentWarmth);
@@ -268,6 +282,12 @@ export class LanternControl {
         }
     }
 
+    private notifyDebugLightingChange(): void {
+        if (this.onDebugLightingChangeCallback) {
+            this.onDebugLightingChangeCallback(this.isDebugLightingEnabled);
+        }
+    }
+
     public onWarmthChange(callback: (warmth: number) => void): void {
         this.onWarmthChangeCallback = callback;
     }
@@ -278,6 +298,10 @@ export class LanternControl {
 
     public onEnableChange(callback: (enabled: boolean) => void): void {
         this.onEnableChangeCallback = callback;
+    }
+
+    public onDebugLightingChange(callback: (enabled: boolean) => void): void {
+        this.onDebugLightingChangeCallback = callback;
     }
 
     public setWarmth(warmth: number): void {
@@ -308,6 +332,16 @@ export class LanternControl {
 
     public getEnabled(): boolean {
         return this.isEnabled;
+    }
+
+    public setDebugLighting(enabled: boolean): void {
+        this.isDebugLightingEnabled = enabled;
+        this.updateDebugLightingCheckbox();
+        this.notifyDebugLightingChange();
+    }
+
+    public getDebugLighting(): boolean {
+        return this.isDebugLightingEnabled;
     }
 }
 

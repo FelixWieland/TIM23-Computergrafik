@@ -1,5 +1,5 @@
 import type { Scene } from "three";
-import { Group, PointLight, Box3, Mesh, MeshStandardMaterial, Color } from "three";
+import { Group, PointLight, Box3, Mesh, MeshStandardMaterial, Color, AmbientLight, DirectionalLight } from "three";
 import { Gltf } from "./gltf";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader.js";
 
@@ -14,6 +14,10 @@ export class Lanterns extends Gltf {
     private lanternInstances: Group[] = [];
     private lights: PointLight[] = [];
     private isEnabled: boolean = true;
+    private debugLightingEnabled: boolean = false;
+    private debugAmbientLight: AmbientLight | null = null;
+    private debugDirectionalLight: DirectionalLight | null = null;
+    private debugAmbientLight2: AmbientLight | null = null;
     
     private lanternPositions: Array<{ x: number; y: number; z: number }> = [
         { x: 0, y: 0, z: 0 },
@@ -32,7 +36,6 @@ export class Lanterns extends Gltf {
         { x: 300, y: 0, z: 0 },
         { x: -300, y: 0, z: 0 },
         { x: 0, y: 0, z: 300 },
-        { x: 0, y: 0, z: -300 },
         { x: 50, y: 0, z: 50 },
         { x: -50, y: 0, z: -50 },
         { x: 250, y: 0, z: 100 },
@@ -142,6 +145,9 @@ export class Lanterns extends Gltf {
             this.lanternInstances.push(lanternClone);
             this.lanternGroup.add(lanternClone);
         });
+
+        this.setWarmth(0.6);
+        this.setIntensity(30.0);
         
         this.scene.add(this.lanternGroup);
     }
@@ -209,5 +215,66 @@ export class Lanterns extends Gltf {
      */
     public animate() {
         if (this.laternGltf === null) return;
+    }
+
+    /**
+     * Enables or disables debug lighting for development purposes.
+     * Creates ambient and directional lights to make objects visible during debugging.
+     * @param enabled Whether debug lighting should be enabled
+     */
+    public setDebugLighting(enabled: boolean) {
+        if (this.debugLightingEnabled === enabled) return;
+        
+        this.debugLightingEnabled = enabled;
+        
+        if (enabled) {
+            // Create debug lights if they don't exist
+            if (!this.debugAmbientLight) {
+                this.debugAmbientLight = new AmbientLight(0x404040, 0.3);
+                this.scene.add(this.debugAmbientLight);
+            }
+            
+            if (!this.debugDirectionalLight) {
+                this.debugDirectionalLight = new DirectionalLight(0xffffff, 1.0);
+                this.debugDirectionalLight.position.set(100, 100, 100);
+                this.debugDirectionalLight.target.position.set(0, 0, 0);
+                this.debugDirectionalLight.castShadow = false; // Disable shadows for debugging
+                this.scene.add(this.debugDirectionalLight);
+                this.scene.add(this.debugDirectionalLight.target);
+            }
+            
+            if (!this.debugAmbientLight2) {
+                this.debugAmbientLight2 = new AmbientLight(0xffffff, 0.8);
+                this.scene.add(this.debugAmbientLight2);
+            }
+        } else {
+            // Remove debug lights
+            if (this.debugAmbientLight) {
+                this.scene.remove(this.debugAmbientLight);
+                this.debugAmbientLight.dispose();
+                this.debugAmbientLight = null;
+            }
+            
+            if (this.debugDirectionalLight) {
+                this.scene.remove(this.debugDirectionalLight);
+                this.scene.remove(this.debugDirectionalLight.target);
+                this.debugDirectionalLight.dispose();
+                this.debugDirectionalLight = null;
+            }
+            
+            if (this.debugAmbientLight2) {
+                this.scene.remove(this.debugAmbientLight2);
+                this.debugAmbientLight2.dispose();
+                this.debugAmbientLight2 = null;
+            }
+        }
+    }
+
+    /**
+     * Checks if debug lighting is currently enabled.
+     * @return True if debug lighting is on, false if off
+     */
+    public getDebugLighting(): boolean {
+        return this.debugLightingEnabled;
     }
 }

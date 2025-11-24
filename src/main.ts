@@ -124,6 +124,10 @@ function main() {
         const lanterns = customScene.getLanterns();
         lanterns.setEnabled(enabled);
     });
+    lanternControl.onDebugLightingChange((enabled: boolean) => {
+        const lanterns = customScene.getLanterns();
+        lanterns.setDebugLighting(enabled);
+    });
     tourControl.onTourSelect(async (tour: Tour) => {
         console.log(`Starting tour: ${tour.name}`);
         const camera = customScene.getCamera();

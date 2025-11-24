@@ -67,8 +67,7 @@ export class Scene {
      * This sets up the sun, sky, fog, clouds, water, terrain, buildings, and other objects.
      */
     public setup() {
-        // Setup camera, debug lighting, pointer lock controls, keyboard controls
-        this.setupDebugLighting()
+        // Setup camera, pointer lock controls, keyboard controls
         this.setupCamera();
         this.setupPointerLockControls();
 
@@ -90,24 +89,6 @@ export class Scene {
         this.clocks = new Clocks(this.scene)
     }
 
-    /**
-     * Adds debug lighting to the scene for development purposes.
-     * Creates ambient and directional lights to make objects visible during debugging.
-     */
-    private setupDebugLighting() {
-        // return;
-        
-        const ambientLight = new THREE.AmbientLight(0x404040, 0.3);
-        this.scene.add(ambientLight);
-        const debugLight = new THREE.DirectionalLight(0xffffff, 1.0);
-        debugLight.position.set(100, 100, 100);
-        debugLight.target.position.set(0, 0, 0);
-        debugLight.castShadow = false; // Disable shadows for debugging
-        this.scene.add(debugLight);
-        this.scene.add(debugLight.target);
-        const debugAmbientLight = new THREE.AmbientLight(0xffffff, 0.8);
-        this.scene.add(debugAmbientLight);
-    }
 
     /**
      * Positions the camera at its starting location and configures its rotation order.
