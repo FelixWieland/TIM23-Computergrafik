@@ -117,8 +117,11 @@ export class Scene {
     private setupCamera() {
         const distance = getReferenceDistance();
         this.camera.position.set(0, distance * 0.1, distance * 0.2);
-        this.camera.lookAt(0, 1, 0);
+        // -7.12, 262.61, -398.17 | -46.8°, -179.0°
+
         this.camera.rotation.order = 'YXZ';
+        this.camera.position.set(-7.12, 262.61, -398.17);
+        this.camera.rotation.set(-0.7788, -3.1388, 0);
     }
 
     /**

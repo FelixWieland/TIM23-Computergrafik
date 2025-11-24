@@ -7,8 +7,8 @@ import { Tour } from './tour';
  */
 export const tours: Tour[] = [
     new Tour(
-        "Demo Tour",
-        "Test",
+        "Kirchentur",
+        "Ein Rundumflug um die Kirche",
         [
             {
                 position: new THREE.Vector3(137.8763, 40.6445, 36.1236),
@@ -55,4 +55,3 @@ export const tours: Tour[] = [
         ]
     ),
 ];
-
