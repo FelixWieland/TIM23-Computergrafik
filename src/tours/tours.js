@@ -744,5 +744,35 @@ export const tours = [
             dateTime: new Date(2025, 10, 24, 10, 0), // 10:00
             duration: 5000
         },
+    ]),
+    new Tour("Dauerhafter Sonnenaufgang", "Erlebe ein beleuchtetes Biberach während des Sonnenaufgangs", [
+        {
+            position: new THREE.Vector3(500.5060, 100.4253, -170.2024),
+            cameraRotation: {
+                pitch: -0.1228,
+                yaw: 2.0364
+            },
+            cloudMovementSpeed: 0.4125,
+            cloudAmount: 0.6687,
+            colorWarmth: 0.7067,
+            colorIntensity: 24.1667,
+            fogValue: 0.000000,
+            dateTime: new Date(2025, 10, 24, 7, 40), // 07:40
+            duration: 1
+        },
+        {
+            position: new THREE.Vector3(500.5060, 100.4253, -170.2024),
+            cameraRotation: {
+                pitch: -0.1228,
+                yaw: 2.0364
+            },
+            cloudMovementSpeed: 0.4125,
+            cloudAmount: 0.6687,
+            colorWarmth: 0.7067,
+            colorIntensity: 24.1667,
+            fogValue: 0.000000,
+            dateTime: new Date(2025, 10, 24, 7, 40), // 07:40
+            duration: 1
+        },
     ])
 ];
